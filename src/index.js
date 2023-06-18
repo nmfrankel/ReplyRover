@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { find } from 'geo-tz'
 import { getZmanimJson } from 'kosher-zmanim'
-import { formatTime } from './utils.js'
+import { formatDate, formatTime } from './utils.js'
 
 dotenv.config()
 
@@ -18,11 +18,11 @@ app.get('/', (req, res) => {
 })
 
 app.post('/zmanim', async (req, res) => {
-    // if (req.body.event === 'new_user') {
+	// if (req.body.event === 'new_user') {
 
-    // }
+	// }
 
-    if (req.body.event !== 'message') return
+	if (req.body.event !== 'message') return
 
 	// tslint:disable-next-line:no-console
 	console.log(req.body)
@@ -76,7 +76,8 @@ app.post('/zmanim', async (req, res) => {
 	// tslint:disable-next-line:no-console
 	// console.log(zmanim)
 
-	const reply = `${formatted_address}\n
+	const reply = `${formatted_address}\n\n
+${formatDate(zmanim.Zmanim.AlosHashachar, timeZoneId)}
 Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}
 Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}
 Netz: ${formatTime(zmanim.Zmanim.SeaLevelSunrise, timeZoneId)}
@@ -85,9 +86,7 @@ Shema_Gra: ${formatTime(zmanim.Zmanim.SofZmanShmaGRA, timeZoneId)}
 Shachris: ${formatTime(zmanim.Zmanim.SofZmanTfilaGRA, timeZoneId)}
 Chatzos: ${formatTime(zmanim.Zmanim.Chatzos, timeZoneId)}
 Mincha: ${formatTime(zmanim.Zmanim.MinchaGedola, timeZoneId)}
-
 Plag_Gra: ${formatTime(zmanim.Zmanim.PlagHamincha, timeZoneId)}
-
 Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}
 3 Stars: ${formatTime(zmanim.Zmanim.Tzais, timeZoneId)}
 72 Min: ${formatTime(zmanim.Zmanim.Tzais72, timeZoneId)}`
@@ -100,7 +99,7 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}
 		`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`,
 		{
 			headers: {
-				'Accept': 'application/json',
+				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
