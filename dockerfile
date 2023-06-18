@@ -12,4 +12,7 @@ COPY . .
 ENV PORT=80
 EXPOSE 80
 
+# Build
+RUN npm run build
+
 CMD [ "npm", "run", "start" ]
