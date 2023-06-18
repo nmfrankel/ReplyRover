@@ -18,6 +18,9 @@ app.get('/', (req, res) => {
 })
 
 app.post('/zmanim', async (req, res) => {
+	// tslint:disable-next-line:no-console
+    console.log(req.body)
+
 	const location = req.body.message?.replace('zmanim ', '') ?? 'Brooklyn, NY'
 
 	const geocoding = await fetch(
