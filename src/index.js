@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.post('/zmanim', async (req, res) => {
 	// tslint:disable-next-line:no-console
-    console.log(req.body)
+	console.log(req.body)
 
 	const location = req.body.message?.replace('zmanim ', '') ?? 'Brooklyn, NY'
 
@@ -91,20 +91,24 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
 
 	await new Promise((r) => setTimeout(r, 3000))
 
-	const remindGateReply = await fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`, {
-		method: 'POST',
-        header: {
-            "content-type": "application/json"
-        },
-		body: JSON.stringify({
-			message: reply,
-            file: null,
-            filename: null
-		})
-	})
-    
+	const remindGateReply = await fetch(
+		`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`,
+		{
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				message: reply,
+				file: null,
+				filename: null
+			}),
+			method: 'POST'
+		}
+	)
+
 	// tslint:disable-next-line:no-console
-    console.log(remindGateReply)
+	console.log(remindGateReply.status, await remindGateReply.text())
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)
