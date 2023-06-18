@@ -22,21 +22,24 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', async (req, res) => {
-	// Handle new users
-	if (req.body.event === 'new_user') {
-		await new Promise((r) => setTimeout(r, 3000))
-		await remindGate(req.body.user_id, WELCOME_MSG)
-	}
-
-	// Ensure that we are dealing with a message
-	if (req.body.event !== 'message') return
+	// Extract msg info
+	const { event, message, user_id } = req.body
 
 	// Log the message
 	// tslint:disable-next-line:no-console
-	console.log(req.body)
+	console.log(event, message, user_id)
+
+	// Handle new users
+	if (event === 'new_user') {
+		await new Promise((r) => setTimeout(r, 3000))
+		await remindGate(user_id, WELCOME_MSG)
+	}
+
+	// Ensure that we are dealing with a message
+	if (event !== 'message') return
 
 	// Get the location from the message
-	const location = req.body.message?.replace('zmanim', '') ?? 'Brooklyn, NY'
+	const location = message?.replace('zmanim', '') ?? 'Brooklyn, NY'
 
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
@@ -90,7 +93,7 @@ app.post('/', async (req, res) => {
 		reply = reply.concat('\n' + tommorowsZmanimList[i].toStr(timeZoneId))
 	}
 
-	const remindGateReply = await remindGate(req.body.user_id, reply)
+	const remindGateReply = await remindGate(user_id, reply)
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)
