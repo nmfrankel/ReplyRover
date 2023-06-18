@@ -76,7 +76,7 @@ app.post('/zmanim', async (req, res) => {
 	// tslint:disable-next-line:no-console
 	// console.log(zmanim)
 
-	const reply = `${formatted_address}\n\n
+	const reply = `${formatted_address}\n
 ${formatDate(zmanim.Zmanim.AlosHashachar, timeZoneId)}
 Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}
 Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}
