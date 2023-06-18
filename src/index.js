@@ -67,7 +67,8 @@ app.post('/zmanim', async (req, res) => {
 	// tslint:disable-next-line:no-console
 	// console.log(zmanim)
 
-	const reply = `${formatted_address}\n\n
+	const reply = `@zmanimbot\n
+${formatted_address}\n\n
 Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}\n
 Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}\n
 Netz: ${formatTime(zmanim.Zmanim.SeaLevelSunrise, timeZoneId)}\n
@@ -84,6 +85,15 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
 72 Min: ${formatTime(zmanim.Zmanim.Tzais72, timeZoneId)}`
 	// Ketana: Missing\n
 	// Plag_MA: Missing\n
+
+	await new Promise((r) => setTimeout(r, 3000))
+
+	await fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`, {
+		method: 'POST',
+		body: JSON.stringify({
+			message: reply
+		})
+	})
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)
