@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { find } from 'geo-tz'
 import { getZmanimJson } from 'kosher-zmanim'
-import { formatDate, formatTime } from './utils.js'
+import { formatDate, formatTime, remindGate } from './utils.js'
 
 dotenv.config()
 
@@ -18,9 +18,13 @@ app.get('/', (req, res) => {
 })
 
 app.post('/zmanim', async (req, res) => {
-	// if (req.body.event === 'new_user') {
+	if (req.body.event === 'new_user') {
+		await new Promise((r) => setTimeout(r, 3000))
 
-	// }
+		const welcomeMsg =
+			'To use the zmanim bot. Reply to this number with your zipcode or city, state to get zmanim.'
+		await remindGate(req.body.user_id, welcomeMsg)
+	}
 
 	if (req.body.event !== 'message') return
 
@@ -93,23 +97,7 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}
 	// Ketana: Missing\n
 	// Plag_MA: Missing\n
 
-	await new Promise((r) => setTimeout(r, 3000))
-
-	const remindGateReply = await fetch(
-		`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`,
-		{
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				message: reply,
-				file: null,
-				filename: null
-			}),
-			method: 'POST'
-		}
-	)
+	const remindGateReply = await remindGate(req.body.user_id, reply)
 
 	// tslint:disable-next-line:no-console
 	console.log(remindGateReply.status, await remindGateReply.text())
