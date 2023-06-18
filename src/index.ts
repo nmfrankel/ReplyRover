@@ -23,11 +23,11 @@ app.get('/', (req, res) => {
 
 app.post('/', async (req, res) => {
 	// Extract msg info
-	const { event, user_id, message } = req.body
+	const { event, user_id, user_name, message } = req.body
 
 	// Log the message
 	// tslint:disable-next-line:no-console
-	console.log(event, user_id, message)
+	console.log(event, user_id, user_name, message)
 
 	// Handle new users
 	if (event === 'new_user') {
