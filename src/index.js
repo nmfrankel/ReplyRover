@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
-import bodyParser from 'body-parser'
 import { find } from 'geo-tz'
 import { getZmanimJson } from 'kosher-zmanim'
+import { formatTime } from './utils.js'
 
 dotenv.config()
 
@@ -11,18 +11,14 @@ const app = express()
 const port = process.env.PORT || 8080
 
 app.use(cors())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.json())
 
 app.get('/', (req, res) => {
 	res.send('Hello world!')
 })
 
-app.get('/zmanim', async (req, res) => {
-	// tslint:disable-next-line:no-console
-	// console.log(req.body.message)
-
-	const location = 'zmanim brooklyn, ny'.replace('zmanim ', '')
-	// har%20nof,%20israel
+app.post('/zmanim', async (req, res) => {
+	const location = req.body.message?.replace('zmanim ', '') ?? 'Brooklyn, NY'
 
 	const geocoding = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
@@ -31,9 +27,7 @@ app.get('/zmanim', async (req, res) => {
 	// check for errors
 	const geoRes = await geocoding.json()
 	const coordinates = geoRes.results[0].geometry.location
-
-	// tslint:disable-next-line:no-console
-	console.log(geoRes.results[0].geometry.location)
+	const formatted_address = geoRes.results[0].formatted_address
 
 	const elevationAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/elevation/json?locations=${coordinates.lat},${coordinates.lng}&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
@@ -44,9 +38,6 @@ app.get('/zmanim', async (req, res) => {
 	const elevation = elvRes.results[0].elevation
 
 	const timeZoneId = find(coordinates.lat, coordinates.lng)[0]
-
-	// tslint:disable-next-line:no-console
-	console.log(elevation, timeZoneId)
 
 	const options = {
 		// date: new Date(),
@@ -64,12 +55,38 @@ app.get('/zmanim', async (req, res) => {
 	// Sunrise: SeaLevelSunrise
 	// Latest shema MGA: SofZmanShmaMGA90MinutesZmanis
 	// Latest shema GRA: SofZmanShmaGRA
+	// -- Latest shachris MGA: SofZmanTfilaMGA
+	// Latest shachris Gra: SofZmanTfilaGRA
+	// Chatzos: Chatzos
+	// Earliest mincha: MinchaGedola
+	// Plag hamincha: PlagHamincha
+	// Sunset: SeaLevelSunset
+	// Nightfall - 3 stars emerge: Tzais
+	// Nightfall - 72 minutes: Tzais72
 
 	// tslint:disable-next-line:no-console
-	console.log(zmanim)
+	// console.log(zmanim)
 
-	res.json(zmanim)
-	// res.send('time')
+	const reply = `${formatted_address}\n\n
+Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}\n
+Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}\n
+Netz: ${formatTime(zmanim.Zmanim.SeaLevelSunrise, timeZoneId)}\n
+Shema_MA: ${formatTime(zmanim.Zmanim.SofZmanShmaMGA90MinutesZmanis, timeZoneId)}\n
+Shema_Gra: ${formatTime(zmanim.Zmanim.SofZmanShmaGRA, timeZoneId)}\n
+Shachris: ${formatTime(zmanim.Zmanim.SofZmanTfilaGRA, timeZoneId)}\n
+Chatzos: ${formatTime(zmanim.Zmanim.Chatzos, timeZoneId)}\n
+Mincha: ${formatTime(zmanim.Zmanim.MinchaGedola, timeZoneId)}
+
+Plag_Gra: ${formatTime(zmanim.Zmanim.PlagHamincha, timeZoneId)}
+
+Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
+3 Stars: ${formatTime(zmanim.Zmanim.Tzais, timeZoneId)}\n
+72 Min: ${formatTime(zmanim.Zmanim.Tzais72, timeZoneId)}`
+	// Ketana: Missing\n
+	// Plag_MA: Missing\n
+
+	res.setHeader('content-type', 'text/plain')
+	res.send(reply)
 })
 
 app.listen(port, () => {
