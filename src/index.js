@@ -94,7 +94,9 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
 	await fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`, {
 		method: 'POST',
 		body: JSON.stringify({
-			message: reply
+			message: reply,
+            file: null,
+            filename: null
 		})
 	})
 
