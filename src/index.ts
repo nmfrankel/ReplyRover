@@ -39,7 +39,7 @@ app.post('/', async (req, res) => {
 	if (event !== 'message') return
 
 	// Get the location from the message
-	const location = message?.replace('zmanim', '').replace(/lakewood/i, 'Lakewood, NJ') ?? 'Brooklyn, NY'
+	const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ') ?? 'Brooklyn, NY'
 
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
