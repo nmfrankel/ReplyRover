@@ -18,6 +18,12 @@ app.get('/', (req, res) => {
 })
 
 app.post('/zmanim', async (req, res) => {
+    // if (req.body.event === 'new_user') {
+
+    // }
+
+    if (req.body.event !== 'message') return
+
 	// tslint:disable-next-line:no-console
 	console.log(req.body)
 
@@ -70,21 +76,20 @@ app.post('/zmanim', async (req, res) => {
 	// tslint:disable-next-line:no-console
 	// console.log(zmanim)
 
-	const reply = `@zmanimbot\n
-${formatted_address}\n\n
-Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}\n
-Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}\n
-Netz: ${formatTime(zmanim.Zmanim.SeaLevelSunrise, timeZoneId)}\n
-Shema_MA: ${formatTime(zmanim.Zmanim.SofZmanShmaMGA90MinutesZmanis, timeZoneId)}\n
-Shema_Gra: ${formatTime(zmanim.Zmanim.SofZmanShmaGRA, timeZoneId)}\n
-Shachris: ${formatTime(zmanim.Zmanim.SofZmanTfilaGRA, timeZoneId)}\n
-Chatzos: ${formatTime(zmanim.Zmanim.Chatzos, timeZoneId)}\n
+	const reply = `${formatted_address}\n
+Dawn: ${formatTime(zmanim.Zmanim.AlosHashachar, timeZoneId)}
+Talis: ${formatTime(zmanim.Zmanim.Misheyakir10Point2Degrees, timeZoneId)}
+Netz: ${formatTime(zmanim.Zmanim.SeaLevelSunrise, timeZoneId)}
+Shema_MA: ${formatTime(zmanim.Zmanim.SofZmanShmaMGA90MinutesZmanis, timeZoneId)}
+Shema_Gra: ${formatTime(zmanim.Zmanim.SofZmanShmaGRA, timeZoneId)}
+Shachris: ${formatTime(zmanim.Zmanim.SofZmanTfilaGRA, timeZoneId)}
+Chatzos: ${formatTime(zmanim.Zmanim.Chatzos, timeZoneId)}
 Mincha: ${formatTime(zmanim.Zmanim.MinchaGedola, timeZoneId)}
 
 Plag_Gra: ${formatTime(zmanim.Zmanim.PlagHamincha, timeZoneId)}
 
-Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
-3 Stars: ${formatTime(zmanim.Zmanim.Tzais, timeZoneId)}\n
+Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}
+3 Stars: ${formatTime(zmanim.Zmanim.Tzais, timeZoneId)}
 72 Min: ${formatTime(zmanim.Zmanim.Tzais72, timeZoneId)}`
 	// Ketana: Missing\n
 	// Plag_MA: Missing\n
