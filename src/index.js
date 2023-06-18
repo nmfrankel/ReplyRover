@@ -91,14 +91,20 @@ Shkia: ${formatTime(zmanim.Zmanim.SeaLevelSunset, timeZoneId)}\n
 
 	await new Promise((r) => setTimeout(r, 3000))
 
-	await fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`, {
+	const remindGateReply = await fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${req.body.user_id}`, {
 		method: 'POST',
+        header: {
+            "content-type": "application/json"
+        },
 		body: JSON.stringify({
 			message: reply,
             file: null,
             filename: null
 		})
 	})
+    
+	// tslint:disable-next-line:no-console
+    console.log(remindGateReply)
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)
