@@ -23,11 +23,11 @@ app.get('/', (req, res) => {
 
 app.post('/', async (req, res) => {
 	// Extract msg info
-	const { event, message, user_id } = req.body
+	const { event, user_id, message } = req.body
 
 	// Log the message
 	// tslint:disable-next-line:no-console
-	console.log(event, message, user_id)
+	console.log(event, user_id, message)
 
 	// Handle new users
 	if (event === 'new_user') {
@@ -47,6 +47,11 @@ app.post('/', async (req, res) => {
 	const geoRes = await geocodingAPI.json()
 	const coordinates = geoRes.results[0]?.geometry.location
 	const formatted_address = geoRes.results[0]?.formatted_address
+
+	if (!coordinates || !formatted_address) {
+		await remindGate(user_id, 'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY')
+		return
+	}
 
 	const elevationAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/elevation/json?locations=${coordinates.lat},${coordinates.lng}&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
