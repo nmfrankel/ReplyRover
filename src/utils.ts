@@ -4,18 +4,18 @@ import { DateTime } from 'luxon';
 
 moment.locale('en')
 
-export function formatTime(timestamp: DateTime|null, timezoneId: string) {
+export function formatTime(timestamp: DateTime | null, timezoneId: string) {
 	if (!timestamp) return 'N/A'
 	timestamp = timestamp.setZone(timezoneId)
 	return timestamp.toFormat('h:mm')
 }
-export function formatDate(timestamp:DateTime|null,timezoneId:string) {
+export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 	if (!timestamp) return 'N/A'
 	timestamp = timestamp.setZone(timezoneId)
 	return timestamp.toFormat('EEEE, MMM d')
 }
 
-export const remindGate = async (userId: any, message: string) =>
+const sendToRemindGate = async (userId: any, message: string) =>
 	fetch(`http://zmanim-remind-gate.system.dickersystems.com/message/${userId}`, {
 		method: 'POST',
 		headers: {
@@ -28,6 +28,18 @@ export const remindGate = async (userId: any, message: string) =>
 			filename: null
 		})
 	})
+
+export async function remindGate (userId: any, message: string) {
+	// There is a cap on 300 characters for the message
+	// SO split it up into multiple messages if necessary
+	const messages = message.match(/.{1,300}/g)
+	for (const msg of messages) {
+		await sendToRemindGate(userId, msg)
+	}
+	}
+
+
+
 /* tslint:disable:max-classes-per-file */
 export class Zman {
 	time: DateTime
@@ -37,8 +49,8 @@ export class Zman {
 		this.time = timestamp
 		this.name = name
 	}
-	toStr( timezoneId: string) {
-		return `${this.name}: ${formatTime(this.time,timezoneId)}`
+	toStr(timezoneId: string) {
+		return `${this.name}: ${formatTime(this.time, timezoneId)}`
 	}
 
 }
@@ -57,10 +69,10 @@ export class Zmanim {
 	tzeis: Zman
 	_60Min: Zman
 	_72Min: Zman
-	candleLighting: Zman|null
+	candleLighting: Zman | null
 
 	constructor(
-		clandar:KosherZmanim.ComplexZmanimCalendar,){
+		clandar: KosherZmanim.ComplexZmanimCalendar,) {
 		this.dawn = new Zman(clandar.getAlos16Point1Degrees(), 'Dawn')
 		this.talis = new Zman(clandar.getMisheyakir10Point2Degrees(), 'Talis')
 		this.netz = new Zman(clandar.getSeaLevelSunrise(), 'Netz')
@@ -74,10 +86,10 @@ export class Zmanim {
 		this.tzeis = new Zman(clandar.getTzais(), 'Tzeis')
 		this._60Min = new Zman(clandar.getTzais60(), '60 Min')
 		this._72Min = new Zman(clandar.getTzais72(), '72 Min')
-		clandar.getDate().plus({days:1})
+		clandar.getDate().plus({ days: 1 })
 		// Setting in israel to true being that we shoule never return a time for 2nd day yom tov
-		if (clandar.isAssurBemlacha(clandar.getDate(),clandar.getTzais(),true)) this.candleLighting = new Zman(clandar.getCandleLighting(), 'Candle Lighting')
-		}
+		if (clandar.isAssurBemlacha(clandar.getDate(), clandar.getTzais(), true)) this.candleLighting = new Zman(clandar.getCandleLighting(), 'Candle Lighting')
+	}
 
 	list() {
 		const a = [

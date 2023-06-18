@@ -88,10 +88,12 @@ app.post('/zmanim', async (req, res) => {
 		reply = reply.concat('\n' + tommorowsZmanimList[i].toStr(timeZoneId))
 	}
 
+
+
+
 	const remindGateReply = await remindGate(req.body.user_id, reply)
 
-	// tslint:disable-next-line:no-console
-	console.log(remindGateReply.status, await remindGateReply.text())
+
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)
