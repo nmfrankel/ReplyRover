@@ -6,8 +6,7 @@ import * as KosherZmanim from 'kosher-zmanim'
 import { Zmanim, Zman, formatDate, remindGate } from './utils.js'
 import { DateTime } from 'luxon'
 
-const WELCOME_MSG =
-	'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.\nText HELP for more information.'
+const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
 
 dotenv.config()
 
@@ -31,7 +30,7 @@ app.post('/', async (req, res) => {
 
 	// Handle new users
 	if (event === 'new_user') {
-		await new Promise((r) => setTimeout(r, 3000))
+		await new Promise((r) => setTimeout(r, 5000))
 		await remindGate(user_id, WELCOME_MSG)
 	}
 
@@ -62,6 +61,8 @@ app.post('/', async (req, res) => {
 	const elvRes = await elevationAPI.json()
 	const elevation = elvRes.results[0].elevation
 	const timeZoneId = find(coordinates.lat, coordinates.lng)[0]
+
+	// Init location for zmanim
 	const geolocation = new KosherZmanim.GeoLocation(
 		formatted_address,
 		coordinates.lat,
