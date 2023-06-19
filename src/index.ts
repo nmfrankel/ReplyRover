@@ -39,7 +39,8 @@ app.post('/', async (req, res) => {
 	if (event !== 'message') return
 
 	// Get the location from the message
-	const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ') ?? 'Brooklyn, NY'
+	const location =
+		message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ') ?? 'Brooklyn, NY'
 
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
@@ -49,7 +50,9 @@ app.post('/', async (req, res) => {
 	const formatted_address = geoRes.results[0]?.formatted_address
 
 	if (!coordinates || !formatted_address) {
-		await remindGate(user_id, 'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY')
+		const LOCATION_MISSING_ERR =
+			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
+		await remindGate(user_id, LOCATION_MISSING_ERR)
 		return
 	}
 
