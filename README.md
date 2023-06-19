@@ -16,3 +16,5 @@ To deploy the Zmanim Server, follow these steps:
 
 1. Edit the `.env` file and ensure that the correct values are set. You can refer to the `.env.example` file for the expected format.
 1. Build the Docker image by running `docker build --tag zmanim-server .`, and then run the container with `docker run --rm -i -t -p 80:80 zmanim-server:latest`.
+
+> powered by [`Express.js`](https://expressjs.com/).
