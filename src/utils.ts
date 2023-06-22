@@ -82,9 +82,9 @@ export class Zmanim {
 		this.tzeis = new Zman(clandar.getTzais(), 'Tzeis')
 		this._60Min = new Zman(clandar.getTzais60(), '60 Min')
 		this._72Min = new Zman(clandar.getTzais72(), '72 Min')
-		clandar.getDate().plus({ days: 1 })
+
 		// Setting in israel to true being that we shoule never return a time for 2nd day yom tov
-		if (clandar.isAssurBemlacha(clandar.getDate(), clandar.getTzais(), true))
+		if (clandar.isAssurBemlacha(clandar.getDate().plus({ days: 1 }), clandar.getTzais(), true))
 			this.candleLighting = new Zman(clandar.getCandleLighting(), 'Candle Lighting')
 	}
 
