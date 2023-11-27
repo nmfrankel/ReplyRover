@@ -5,7 +5,9 @@ import { find } from 'geo-tz'
 import * as KosherZmanim from 'kosher-zmanim'
 import { Zmanim, Zman, formatDate, remindGate } from './utils.js'
 import { DateTime } from 'luxon'
-import weatherRoute, { getCurrent } from './functions/weather/index.js'
+
+import { getCurrent } from './functions/weather/index.js'
+import { define } from './functions/vocab/index.js'
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
 
@@ -20,9 +22,6 @@ app.use(express.json())
 app.get('/', (req, res) => {
 	res.send('Hello world!')
 })
-
-// For testing
-app.use('/weather', weatherRoute)
 
 app.post('/', async (req, res) => {
 	// Extract msg info
@@ -45,6 +44,9 @@ app.post('/', async (req, res) => {
 	if (message.toLowerCase().startsWith('weather')) {
 		const zipcodes = message.match(/\b(\d{5})\b/)
 		reply = await getCurrent(zipcodes?.[1] ?? '08701')
+	} else if (message.toLowerCase().startsWith('define')) {
+		const term = message.split(/\s/).pop()
+		reply = await define(term ?? 'hello')
 	} else {
 		// Get the location from the message
 		const location =
