@@ -41,9 +41,10 @@ app.post('/', async (req, res) => {
 	if (event !== 'message') return
 
 	let reply = ''
-	if (message.toLowerCase().startsWith('weather')) {
-		const zipcodes = message.match(/\b(\d{5})\b/)
-		reply = await getForcast(zipcodes?.[1] ?? '08701', user_id)
+	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
+		const location =
+			message?.replace('wea?ther ', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ') ?? 'Brooklyn, NY'
+		reply = await getForcast(location, user_id)
 	} else if (message.toLowerCase().startsWith('define')) {
 		const term = message.split(/\s/).pop()
 		reply = await define(term ?? 'hello')

@@ -70,10 +70,9 @@ export const getForcast = async (location: string, userID: string) => {
 		const dt = new Date(d.dt*1000)
 		const high = Math.round(d.temp.max)
 		const low = Math.round(d.temp.min)
-		const desc = d.weather?.[0].main
+		const desc = d.weather?.[0].description
 
-		formatted += `${dt.getMonth()+1}/${dt.getDate()} ${low}°-${high}° ${desc}\n`
-		// console.log('%s/%s %s:%s %s', dt.getMonth()+1, dt.getDate(), low, high, desc)
+		formatted += `${dt.toLocaleString('en-us', {weekday:'short'})} ${dt.getMonth()+1}/${dt.getDate()}: ${low}° - ${high}° ${desc}\n`
 	})
 
 	return formatted
