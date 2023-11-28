@@ -6,7 +6,7 @@ import * as KosherZmanim from 'kosher-zmanim'
 import { Zmanim, Zman, formatDate, remindGate } from './utils.js'
 import { DateTime } from 'luxon'
 
-import { getCurrent } from './functions/weather/index.js'
+import { getCurrent, getForcast } from './functions/weather/index.js'
 import { define } from './functions/vocab/index.js'
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
@@ -43,7 +43,7 @@ app.post('/', async (req, res) => {
 	let reply = ''
 	if (message.toLowerCase().startsWith('weather')) {
 		const zipcodes = message.match(/\b(\d{5})\b/)
-		reply = await getCurrent(zipcodes?.[1] ?? '08701')
+		reply = await getForcast(zipcodes?.[1] ?? '08701', user_id)
 	} else if (message.toLowerCase().startsWith('define')) {
 		const term = message.split(/\s/).pop()
 		reply = await define(term ?? 'hello')

@@ -1,5 +1,6 @@
 import express from 'express'
 import { mapWindCardinals } from './utils.js'
+import { remindGate } from '../../utils.js'
 
 const router = express.Router()
 const baseURL = 'http://api.openweathermap.org/data/2.5/'
@@ -39,20 +40,41 @@ Humidity: ${humi}%${wind}\n\n${proTip}`
 	return formattedWeather
 }
 
-const getForcast = (location: string, days = 7) => {
-	return '`Weather` is not functioning... try again later.'
+export const getForcast = async (location: string, userID: string) => {
+	const geocodingAPI = await fetch(
+	`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
+	)
+	const geoRes = await geocodingAPI.json()
+	const coordinates = geoRes.results[0]?.geometry.location
+	const formatted_address = geoRes.results[0]?.formatted_address
+
+	if (!coordinates || !formatted_address) {
+		const LOCATION_MISSING_ERR =
+			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
+		await remindGate(userID, LOCATION_MISSING_ERR)
+		return
+	}
+
+	const endpoint = `${baseURL}onecall?lat=${coordinates.lat}&lon=${coordinates.lng}&units=imperial&units=imperial&exclude=hourly,minutely&appid=${process.env.OPEN_WEATHER_API_KEY}`
+	const rawWeather = await fetch(endpoint)
+
+	if (rawWeather.status !== 200)
+		return 'An error occured while retrieving the weather, try again later.'
+	const weather = await rawWeather.json()
+	const proTip = `Pro tip: Just text\nWeather for ${location}`
+	let formatted = formatted_address + '\n'
+
+	weather.daily.forEach((d: any, i: number) => {
+		if(i >= 6) return
+
+		const dt = new Date(d.dt*1000)
+		const high = Math.round(d.temp.max)
+		const low = Math.round(d.temp.min)
+		const desc = d.weather?.[0].main
+
+		formatted += `${dt.getMonth()+1}/${dt.getDate()} ${low}°-${high}° ${desc}\n`
+		// console.log('%s/%s %s:%s %s', dt.getMonth()+1, dt.getDate(), low, high, desc)
+	})
+
+	return formatted
 }
-
-// /category/add GET
-router.post('/', async (req, res) => {
-	// Extract msg info
-	const { event, user_id, user_name, message } = req.body
-
-	const zipcodes = message.match(/\b(\d{5})\b/)
-	const reply = await getCurrent(zipcodes?.[1] ?? '08701')
-
-	res.setHeader('content-type', 'text/plain')
-	res.send(reply)
-})
-
-export default router
