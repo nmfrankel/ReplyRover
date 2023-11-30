@@ -15,8 +15,6 @@ export const getCurrent = async (location: string, days = 1) => {
 	const weather = await rawWeather.json()
 	const proTip = `Pro tip: Just text\nWeather for ${location}`
 
-	// console.log(weather.weather)
-
 	// simplify values
 	const city = weather.name
 	const temp = Math.round(weather.main.temp)
@@ -42,7 +40,7 @@ Humidity: ${humi}%${wind}\n\n${proTip}`
 
 export const getForcast = async (location: string, userID: string) => {
 	const geocodingAPI = await fetch(
-	`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
+		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 	)
 	const geoRes = await geocodingAPI.json()
 	const coordinates = geoRes.results[0]?.geometry.location
@@ -65,14 +63,17 @@ export const getForcast = async (location: string, userID: string) => {
 	let formatted = formatted_address + '\n'
 
 	weather.daily.forEach((d: any, i: number) => {
-		if(i >= 6) return
+		if (i >= 6) return
 
-		const dt = new Date(d.dt*1000)
+		const dt = new Date(d.dt * 1000)
+		const dayOfWeek = dt.toLocaleString('en-us', { weekday: 'short' })
+		const month = dt.getMonth() + 1
+		const day = dt.getDate().toString().padStart(2, '0')
 		const high = Math.round(d.temp.max)
 		const low = Math.round(d.temp.min)
 		const desc = d.weather?.[0].description
 
-		formatted += `${dt.toLocaleString('en-us', {weekday:'short'})} ${dt.getMonth()+1}/${dt.getDate()}: ${low}° - ${high}° ${desc}\n`
+		formatted += `${dayOfWeek} ${month}/${day} | ${low}° - ${high}° ${desc}\n`
 	})
 
 	return formatted
