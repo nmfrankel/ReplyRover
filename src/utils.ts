@@ -1,5 +1,6 @@
 import * as KosherZmanim from 'kosher-zmanim'
 import { DateTime } from 'luxon'
+import { PrismaClient } from '@prisma/client'
 
 export function formatTime(timestamp: DateTime | null, timezoneId: string) {
 	if (!timestamp) return 'N/A'
@@ -13,6 +14,7 @@ export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 	return timestamp.toFormat('EEEE, MMM d')
 }
 
+// The next two functions manage sending out messages
 const sendToRemindGate = async (userId: any, message: string) =>
 	fetch(`${process.env.HOST}/message/${userId}`, {
 		method: 'POST',
@@ -38,6 +40,29 @@ export async function remindGate(userId: any, message: string, multiple = false)
 	for (const msg of messages) {
 		await sendToRemindGate(userId, msg)
 	}
+}
+
+// The next section runs db interactions
+declare global {
+	var prisma: PrismaClient | undefined
+}
+
+const db_setup = () => {
+	const prisma = global.prisma || new PrismaClient()
+	if (process.env.NODE_ENV !== 'production') global.prisma = prisma
+}
+
+export const logger = async (event: string, userID: string, username: string, message: string) => {
+	db_setup()
+
+	await global.prisma.log.create({
+		data: {
+			event,
+			userID,
+			username,
+			message
+		}
+	})
 }
 
 /* tslint:disable:max-classes-per-file */
