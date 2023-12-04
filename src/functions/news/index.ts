@@ -1,13 +1,14 @@
 import { JSDOM } from 'jsdom'
 
-// const baseURL = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en'
-const baseURL = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US%3Aen&oc=11'
+const baseURL = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en'
+const baseURLwithSearch = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US%3Aen&oc=11'
 
 export const fetchNews = async (filter: string) => {
-	const endpoint = filter ? `${baseURL}&q=${filter}` : baseURL
+	const endpoint = filter.length > 1 ? `${baseURLwithSearch}&q=${filter}` : baseURL
 	const response = await fetch(endpoint)
 
-	if (response.status !== 200) return `An error occured while defining ${filter}, try again later.`
+	if (response.status !== 200)
+		return `An error occured while getting news on ${filter}, try again later.`
 	const data = await response.text()
 
 	// Process and extract news items from the XML document
