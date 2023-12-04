@@ -38,6 +38,7 @@ app.post('/', async (req, res) => {
 
 	// Ensure that we are dealing with a message
 	if (event !== 'message') return
+	let forceData = false
 
 	let reply = ''
 	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
@@ -47,14 +48,14 @@ app.post('/', async (req, res) => {
 		const term = message.split(/\s/).pop()
 		reply = await define(term ?? 'hello')
 	} else if (message.toLowerCase().startsWith('news')) {
-		reply = await fetchNews(message)
-		res.send(reply)
+		reply = await fetchNews(message.replace(/news\s?/i, ''))
+		forceData = true
 	} else {
 		// Get the location from the message
 		const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 		reply = await generateZmanim(location, user_id)
 	}
-	const remindGateReply = await remindGate(user_id, reply)
+	const remindGateReply = await remindGate(user_id, reply, forceData)
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)

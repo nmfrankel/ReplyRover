@@ -1,26 +1,32 @@
-const baseURL = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en';
+import { JSDOM } from 'jsdom'
+
+// const baseURL = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en'
+const baseURL = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US%3Aen&oc=11'
 
 export const fetchNews = async (filter: string) => {
+	const endpoint = filter ? `${baseURL}&q=${filter}` : baseURL
 	const response = await fetch(endpoint)
 
-	if (response.status !== 200)
-		return `An error occured while defining ${term}, try again later.`
+	if (response.status !== 200) return `An error occured while defining ${filter}, try again later.`
 	const data = await response.text()
 
-	console.log(data)
+	// Process and extract news items from the XML document
+	const { window } = new JSDOM(data)
+	const items = window.document.querySelectorAll('item')
+	const articles = Array.from(items).map((item) => {
+		const [title, source] = item.querySelector('title').textContent.split(' - ')
+		return {
+			title,
+			source,
+			published: item.querySelector('pubDate').textContent
+		}
+	})
+	window.close()
 
-	const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+	let formatted = ''
+	articles.forEach((a, i) => {
+		if (i < 6) formatted += `* ${a.title} [${a.source}]\n`
+	})
 
-    // Extract news items from the XML document
-    const items = xmlDoc.querySelectorAll('item');
-    const newsItems = Array.from(items).map(item => {
-      return {
-        title: item.querySelector('title').textContent,
-        link: item.querySelector('link').textContent,
-        // Add more properties as needed
-      };
-    });
-
-	return data // newsItems
+	return formatted
 }

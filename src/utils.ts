@@ -27,12 +27,14 @@ const sendToRemindGate = async (userId: any, message: string) =>
 		})
 	})
 
-export async function remindGate(userId: any, message: string) {
+export async function remindGate(userId: any, message: string, multiple = false) {
 	// There is a cap on 300 characters for the message
 	// SO split it up into multiple messages if necessary
 
-	// add "g" flag to do it more than once
-	const messages = message.match(/^[\s\S]{0,300}(?=\n|$)/m)
+	// add "g" flag to do send multiple messages
+	const messages = multiple
+		? message.match(/^[\s\S]{0,300}(?=\n|$)/gm)
+		: message.match(/^[\s\S]{0,300}(?=\n|$)/m)
 	for (const msg of messages) {
 		await sendToRemindGate(userId, msg)
 	}
