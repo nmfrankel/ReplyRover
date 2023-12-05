@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
-import { remindGate } from './utils.js'
+import { logger, remindGate } from './utils.js'
 
 import { getForcast } from './functions/weather/index.js'
 import { define } from './functions/vocab/index.js'
@@ -27,8 +27,9 @@ app.post('/', async (req, res) => {
 	const { event, user_id, user_name, message } = req.body
 
 	// Log the message
+	const logged = await logger(event, user_id, user_name, message)
 	// tslint:disable-next-line:no-console
-	console.log(event, user_id, user_name, message)
+	console.log(JSON.stringify(logged))
 
 	// Handle new users
 	if (event === 'new_user') {

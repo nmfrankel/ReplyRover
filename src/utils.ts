@@ -15,8 +15,9 @@ export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 }
 
 // The next two functions manage sending out messages
-const sendToRemindGate = async (userId: any, message: string) =>
-	fetch(`${process.env.HOST}/message/${userId}`, {
+const sendToRemindGate = async (userID: any, message: string) => {
+	await logger('response', userID, 'Unknown', message)
+	fetch(`${process.env.HOST}/message/${userID}`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',
@@ -28,6 +29,7 @@ const sendToRemindGate = async (userId: any, message: string) =>
 			filename: null
 		})
 	})
+}
 
 export async function remindGate(userId: any, message: string, multiple = false) {
 	// There is a cap on 300 characters for the message
@@ -47,15 +49,14 @@ declare global {
 	var prisma: PrismaClient | undefined
 }
 
-const db_setup = () => {
+const initDB = () => {
 	const prisma = global.prisma || new PrismaClient()
 	if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 }
 
 export const logger = async (event: string, userID: string, username: string, message: string) => {
-	db_setup()
-
-	await global.prisma.log.create({
+	initDB()
+	const entry = await global.prisma.log.create({
 		data: {
 			event,
 			userID,
@@ -63,6 +64,7 @@ export const logger = async (event: string, userID: string, username: string, me
 			message
 		}
 	})
+	return entry
 }
 
 /* tslint:disable:max-classes-per-file */
