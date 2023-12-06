@@ -1,0 +1,252 @@
+{
+	"geocoded_waypoints" : 
+	[
+	   {
+		  "geocoder_status" : "OK",
+		  "place_id" : "ChIJVxPP-N5EwokRXXf9Pczdvmk",
+		  "types" : 
+		  [
+			 "premise"
+		  ]
+	   },
+	   {
+		  "geocoder_status" : "OK",
+		  "place_id" : "ChIJNxrXXzJbwokRt1e_PQ-CKjY",
+		  "types" : 
+		  [
+			 "premise"
+		  ]
+	   }
+	],
+	"routes" : 
+	[
+	   {
+		  "bounds" : 
+		  {
+			 "northeast" : 
+			 {
+				"lat" : 40.638895,
+				"lng" : -73.9694854
+			 },
+			 "southwest" : 
+			 {
+				"lat" : 40.6188337,
+				"lng" : -73.9798766
+			 }
+		  },
+		  "copyrights" : "Map data ©2023 Google",
+		  "legs" : 
+		  [
+			 {
+				"distance" : 
+				{
+				   "text" : "2.0 mi",
+				   "value" : 3250
+				},
+				"duration" : 
+				{
+				   "text" : "11 mins",
+				   "value" : 665
+				},
+				"end_address" : "468 E 9th St, Brooklyn, NY 11218, USA",
+				"end_location" : 
+				{
+				   "lat" : 40.6371658,
+				   "lng" : -73.9694854
+				},
+				"start_address" : "5815 21st Ave, Brooklyn, NY 11204, USA",
+				"start_location" : 
+				{
+				   "lat" : 40.6188337,
+				   "lng" : -73.9798766
+				},
+				"steps" : 
+				[
+				   {
+					  "distance" : 
+					  {
+						 "text" : "0.3 mi",
+						 "value" : 450
+					  },
+					  "duration" : 
+					  {
+						 "text" : "1 min",
+						 "value" : 72
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.6220053,
+						 "lng" : -73.9765771
+					  },
+					  "html_instructions" : "Head \u003cb\u003enortheast\u003c/b\u003e on \u003cb\u003e21st Ave\u003c/b\u003e toward \u003cb\u003e58th St\u003c/b\u003e",
+					  "polyline" : 
+					  {
+						 "points" : "uj|vFfepbMiAkAoBsBeAiAi@i@s@u@k@m@s@u@m@q@m@o@sAyAEEGC"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.6188337,
+						 "lng" : -73.9798766
+					  },
+					  "travel_mode" : "DRIVING"
+				   },
+				   {
+					  "distance" : 
+					  {
+						 "text" : "0.1 mi",
+						 "value" : 166
+					  },
+					  "duration" : 
+					  {
+						 "text" : "1 min",
+						 "value" : 32
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.623481,
+						 "lng" : -73.97683400000001
+					  },
+					  "html_instructions" : "Continue onto \u003cb\u003eDahill Rd\u003c/b\u003e",
+					  "polyline" : 
+					  {
+						 "points" : "q~|vFrpobMKAK?KB{C^G?}AN"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.6220053,
+						 "lng" : -73.9765771
+					  },
+					  "travel_mode" : "DRIVING"
+				   },
+				   {
+					  "distance" : 
+					  {
+						 "text" : "0.3 mi",
+						 "value" : 537
+					  },
+					  "duration" : 
+					  {
+						 "text" : "3 mins",
+						 "value" : 171
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.6241723,
+						 "lng" : -73.97054059999999
+					  },
+					  "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eAvenue J\u003c/b\u003e",
+					  "maneuver" : "turn-right",
+					  "polyline" : 
+					  {
+						 "points" : "wg}vFdrobMAOK_BG{AC[WqE?ISqDQuDI_AE_AE{@WuEAWAS"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.623481,
+						 "lng" : -73.97683400000001
+					  },
+					  "travel_mode" : "DRIVING"
+				   },
+				   {
+					  "distance" : 
+					  {
+						 "text" : "1.0 mi",
+						 "value" : 1622
+					  },
+					  "duration" : 
+					  {
+						 "text" : "4 mins",
+						 "value" : 258
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.6385363,
+						 "lng" : -73.9731096
+					  },
+					  "html_instructions" : "Turn \u003cb\u003eleft\u003c/b\u003e onto \u003cb\u003eOcean Pkwy\u003c/b\u003e",
+					  "maneuver" : "turn-left",
+					  "polyline" : 
+					  {
+						 "points" : "al}vFzjnbMCWkCX}@JqANu@J_CTK?cBRG?[FcAJK@aAJ[DK@sCZUDm@FuBR[DcAJy@H]D_ALsALkBRe@Fu@J{BVW@_AJO@]Dm@FqD^_CVE@E?g@H_AJcBReGn@sBT"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.6241723,
+						 "lng" : -73.97054059999999
+					  },
+					  "travel_mode" : "DRIVING"
+				   },
+				   {
+					  "distance" : 
+					  {
+						 "text" : "0.2 mi",
+						 "value" : 281
+					  },
+					  "duration" : 
+					  {
+						 "text" : "1 min",
+						 "value" : 73
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.638895,
+						 "lng" : -73.96981400000001
+					  },
+					  "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eCortelyou Rd\u003c/b\u003e",
+					  "maneuver" : "turn-right",
+					  "polyline" : 
+					  {
+						 "points" : "{e`wF|znbMAQAWKuBKcBUuEUyD"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.6385363,
+						 "lng" : -73.9731096
+					  },
+					  "travel_mode" : "DRIVING"
+				   },
+				   {
+					  "distance" : 
+					  {
+						 "text" : "0.1 mi",
+						 "value" : 194
+					  },
+					  "duration" : 
+					  {
+						 "text" : "1 min",
+						 "value" : 59
+					  },
+					  "end_location" : 
+					  {
+						 "lat" : 40.6371658,
+						 "lng" : -73.9694854
+					  },
+					  "html_instructions" : "Turn \u003cb\u003eright\u003c/b\u003e onto \u003cb\u003eE 9th St\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eDestination will be on the right\u003c/div\u003e",
+					  "maneuver" : "turn-right",
+					  "polyline" : 
+					  {
+						 "points" : "ch`wFhfnbMxI_A"
+					  },
+					  "start_location" : 
+					  {
+						 "lat" : 40.638895,
+						 "lng" : -73.96981400000001
+					  },
+					  "travel_mode" : "DRIVING"
+				   }
+				],
+				"traffic_speed_entry" : [],
+				"via_waypoint" : []
+			 }
+		  ],
+		  "overview_polyline" : 
+		  {
+			 "points" : "uj|vFfepbMkN_OaCiCMIWAgDb@eBNMoBc@sIu@gNa@}HCWkCXoCZuD`@oBRsBT}Fn@qLpA_O|A}JdAsBViJbAsBTAQMmCa@yHUyDxI_A"
+		  },
+		  "summary" : "Ocean Pkwy",
+		  "warnings" : [],
+		  "waypoint_order" : []
+	   }
+	],
+	"status" : "OK"
+ }
