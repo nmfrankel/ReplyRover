@@ -7,6 +7,7 @@ import { getForcast } from './functions/weather/index.js'
 import { define } from './functions/vocab/index.js'
 import { fetchNews } from './functions/news/index.js'
 import { generateZmanim } from './functions/zmanim/index.js'
+import { fetchDirections } from './functions/directions/index.js'
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
 
@@ -29,7 +30,7 @@ app.post('/', async (req, res) => {
 	// Log the message
 	const logged = await logger(event, user_id, user_name, message)
 	// tslint:disable-next-line:no-console
-	console.log(JSON.stringify(logged))
+	console.log(...logged)
 
 	// Handle new users
 	if (event === 'new_user') {
@@ -51,6 +52,8 @@ app.post('/', async (req, res) => {
 	} else if (message.toLowerCase().startsWith('news')) {
 		reply = 'The news service has been blocked due to spamming.'
 		forceData = true
+	} else if (message.toLowerCase().startsWith('directions')) {
+		reply = await fetchDirections(message)
 	} else {
 		// Get the location from the message
 		const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
