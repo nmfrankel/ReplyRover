@@ -49,7 +49,7 @@ app.post('/', async (req, res) => {
 		const term = message.split(/\s/).pop()
 		reply = await define(term ?? 'hello')
 	} else if (message.toLowerCase().startsWith('news')) {
-		reply = await fetchNews(message.replace(/news\s?/i, ''))
+		reply = 'The news service has been blocked due to spamming.'
 		forceData = true
 	} else {
 		// Get the location from the message
