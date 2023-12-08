@@ -57,8 +57,6 @@ app.post('/', async (req, res) => {
 		reply = await fetchDirections(message)
 	} else if (message.toLowerCase().startsWith('lookup')) {
 		reply = await entitySearch(message)
-		res.send(reply)
-		return
 	} else {
 		// Get the location from the message
 		const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
