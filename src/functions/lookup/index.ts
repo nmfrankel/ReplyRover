@@ -1,28 +1,28 @@
 interface EntitySearch {
-    places?: {
-        nationalPhoneNumber: string;
-        formattedAddress: string;
-        regularOpeningHours: {
-            openNow: boolean;
-            periods: {
-                open: {
-                    day: number;
-                    hour: number;
-                    minute: number;
-                };
-                close: {
-                    day: number;
-                    hour: number;
-                    minute: number;
-                };
-            }[];
-            weekdayDescriptions: string[];
-        };
-        displayName: {
+	places?: {
+		nationalPhoneNumber: string;
+		formattedAddress: string;
+		regularOpeningHours: {
+			openNow: boolean;
+			periods: {
+				open: {
+					day: number;
+					hour: number;
+					minute: number;
+				};
+				close: {
+					day: number;
+					hour: number;
+					minute: number;
+				};
+			}[];
+			weekdayDescriptions: string[];
+		};
+		displayName: {
 			text: string
 			languageCode: string
-        };
-    }[];
+		};
+	}[];
 }
 
 const search = async (entity: string): Promise<EntitySearch> => {
@@ -41,29 +41,54 @@ const search = async (entity: string): Promise<EntitySearch> => {
 	return response.json()
 }
 
-const errorMsg = 'Start the message with "lookup" followed by the [company name] and [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
+const errorMsg = 'Start the message with "lookup" followed by the [company name], [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
 
 export const entitySearch = async (msg: string) => {
 	const entity = msg.replace(/lookup\s?/, '')
 
-	if(entity.length < 2) return errorMsg
+	if (entity.length < 2) return errorMsg
 
 	const entities = await search(entity)
 
-	if(!entities.places) return 'No lookup matches found.\n' + errorMsg
+	if (!entities.places) return 'No lookup matches found.\n' + errorMsg
 
-	const [ place ] = entities.places
+	const [place] = entities.places
 	const cleanedAddress = place?.formattedAddress.replace(', ', '\n')
 
 	let formattedEntities = `${place.displayName.text}\n${cleanedAddress}\n${place.nationalPhoneNumber}`
 
 	// If hours are posted and not open 24/7
-	if(place.regularOpeningHours?.periods.length > 1) {
+	if (place.regularOpeningHours?.periods.length > 1) {
 		formattedEntities += '\n\nHours'
-		for (const weekday of place.regularOpeningHours.weekdayDescriptions) {
-			// shorten name of day and append to response
-			formattedEntities += '\n' + weekday.replace(/^(\w{3}).*day:(.*)/, '$1:$2')
-		}
+
+		// Reorder weekdays to start with Sunday
+		let weekdays = [place.regularOpeningHours.weekdayDescriptions.pop()]
+		weekdays = [...weekdays, ...place.regularOpeningHours.weekdayDescriptions]
+
+		// shorten day name from Sunday -> Sun
+		weekdays = weekdays.map((weekday: string) => weekday.replace(/^(\w{3}).*day:(.*)/, '$1:$2'))
+
+		// Combine days with the same hours
+		const mergedDays = weekdays.reduce((result, day) => {
+			const [currentDay, schedule] = day.split(': ');
+			const lastEntry = result[result.length - 1];
+
+			if (lastEntry && lastEntry.schedule === schedule) {
+				lastEntry.endDay = currentDay;
+			} else {
+				result.push({ startDay: currentDay, endDay: currentDay, schedule });
+			}
+
+			return result;
+		}, []);
+
+		formattedEntities += mergedDays.map(({ startDay, endDay, schedule }) => {
+			if (startDay === endDay) {
+				return `\n${startDay}: ${schedule}`;
+			} else {
+				return `\n${startDay} - ${endDay}: ${schedule}`;
+			}
+		}).join('')
 	}
 
 	return formattedEntities

@@ -31,7 +31,7 @@ app.post('/', async (req, res) => {
 	// Log the message
 	const logged = await logger(event, user_id, user_name, message)
 	// tslint:disable-next-line:no-console
-	console.log({...logged})
+	console.log(JSON.stringify(logged))
 
 	// Handle new users
 	if (event === 'new_user') {
