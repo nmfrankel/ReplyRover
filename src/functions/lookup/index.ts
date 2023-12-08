@@ -41,7 +41,7 @@ const search = async (entity: string): Promise<EntitySearch> => {
 	return response.json()
 }
 
-const errorMsg = 'Start the message with "lookup" followed by the [company name] and [city, state or zipcode].\nI.e. Beth Medrash Govoha, 08701'
+const errorMsg = 'Start the message with "lookup" followed by the [company name] and [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
 
 export const entitySearch = async (msg: string) => {
 	const entity = msg.replace(/lookup\s?/, '')
