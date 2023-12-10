@@ -55,13 +55,6 @@ const initDB = () => {
 }
 
 export const logger = async (event: string, userID: string, username: string, message: string) => {
-	return {
-		event,
-		userID,
-		username,
-		message
-	}
-
 	initDB()
 	const entry = await global.prisma.log.create({
 		data: {
