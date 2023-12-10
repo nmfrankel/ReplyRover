@@ -2,31 +2,38 @@ const baseURL = 'https://maps.googleapis.com/maps/api/directions/json'
 
 // https://developers.google.com/maps/documentation/directions/get-directions
 
-interface HTMLinstructions {
-    routes: {
-        legs: {
-            steps: {
+interface DirectionResponse {
+	routes: {
+		legs: {
+			steps: {
 				distance: {
-					text: string;
-					value: number;
-				};
+					text: string
+					value: number
+				}
 				duration: {
-					text: string;
-					value: number;
-				};
+					text: string
+					value: number
+				}
 				end_location: {
-					lat: number;
-					lng: number;
-				};
-				html_instructions: string;
-				travel_mode: string;
+					lat: number
+					lng: number
+				}
+				html_instructions: string
+				travel_mode: string
 			}[]
-        }[];
-    }[];
+		}[]
+	}[]
 }
 
+type StepsType = DirectionResponse['routes'][0]['legs'][0]['steps']
+
 const styleHtmlToText = (instruction: string) => {
-	return instruction.replace(/<\/?b>/g, '**').replace('<wbr/>', '').replace(/<[\w\s]+.*?>/g, '\n- ').replace(/<\/[\w\s]+.*?>/g, '').replace('**/**', '/')
+	return instruction
+		.replace(/<\/?b>/g, '**')
+		.replace('<wbr/>', '')
+		.replace(/<[\w\s]+.*?>/g, '\n- ')
+		.replace(/<\/[\w\s]+.*?>/g, '')
+		.replace('**/**', '/')
 }
 
 export const fetchDirections = async (msg: string) => {
@@ -37,8 +44,14 @@ export const fetchDirections = async (msg: string) => {
 	const endpoint = `${baseURL}?origin=${origin}&destination=${destination}&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 
 	const res = await fetch(endpoint)
-	const options = await res.json()
-	const steps = options.routes?.[0].legs?.[0].steps
+	const options: DirectionResponse = await res.json()
+	let steps: StepsType = []
+
+	try {
+		steps = options.routes[0].legs[0].steps
+	} catch (err) {
+		return 'An error occured, we could not find a route for your given input at this time.'
+	}
 
 	let formattedDirections = ''
 	for (const step of steps) {
