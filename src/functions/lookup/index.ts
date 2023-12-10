@@ -58,7 +58,9 @@ export const entitySearch = async (msg: string) => {
 	let formattedEntities = `${place.displayName.text}\n${cleanedAddress}\n${place.nationalPhoneNumber}`
 
 	// If hours are posted and not open 24/7
-	if (place.regularOpeningHours?.periods.length > 1) {
+	if (place.regularOpeningHours?.periods.length === 1) {
+		formattedEntities += '\n\nHours\nOpen 24 hours daily, 7 days a week'
+	} else if (place.regularOpeningHours?.periods.length > 1) {
 		formattedEntities += '\n\nHours'
 
 		// Reorder weekdays to start with Sunday
