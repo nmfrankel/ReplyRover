@@ -1,47 +1,49 @@
 interface EntitySearch {
 	places?: {
-		nationalPhoneNumber: string;
-		formattedAddress: string;
+		nationalPhoneNumber: string
+		formattedAddress: string
 		regularOpeningHours: {
-			openNow: boolean;
+			openNow: boolean
 			periods: {
 				open: {
-					day: number;
-					hour: number;
-					minute: number;
-				};
+					day: number
+					hour: number
+					minute: number
+				}
 				close: {
-					day: number;
-					hour: number;
-					minute: number;
-				};
-			}[];
-			weekdayDescriptions: string[];
-		};
+					day: number
+					hour: number
+					minute: number
+				}
+			}[]
+			weekdayDescriptions: string[]
+		}
 		displayName: {
 			text: string
 			languageCode: string
-		};
-	}[];
+		}
+	}[]
 }
 
 const search = async (entity: string): Promise<EntitySearch> => {
 	const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
 		method: 'POST',
 		headers: {
-			"Content-Type": "application/json",
-			"X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.regularOpeningHours",
-			"X-Goog-Api-Key": process.env.GOOGLE_MAPS_PLATFORM_API_KEY
+			'Content-Type': 'application/json',
+			'X-Goog-FieldMask':
+				'places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.regularOpeningHours',
+			'X-Goog-Api-Key': process.env.GOOGLE_MAPS_PLATFORM_API_KEY
 		},
 		body: JSON.stringify({
-			"textQuery": entity,
-			"languageCode": 'en'
+			textQuery: entity,
+			languageCode: 'en'
 		})
 	})
 	return response.json()
 }
 
-const errorMsg = 'Start the message with "lookup" followed by the [company name], [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
+const errorMsg =
+	'Start the message with "lookup" followed by the [company name], [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
 
 export const entitySearch = async (msg: string) => {
 	const entity = msg.replace(/lookup\s?/, '')
@@ -52,46 +54,52 @@ export const entitySearch = async (msg: string) => {
 
 	if (!entities.places) return 'No lookup matches found.\n' + errorMsg
 
-	const [place] = entities.places
-	const cleanedAddress = place?.formattedAddress.replace(', ', '\n')
+	const places = entities.places.map((place, i) => {
+		if (i >= 3) return
 
-	let formattedEntities = `${place.displayName.text}\n${cleanedAddress}\n${place.nationalPhoneNumber}`
+		const cleanedAddress = place?.formattedAddress.replace(', ', '\n')
 
-	// If hours are posted and not open 24/7
-	if (place.regularOpeningHours?.periods.length === 1) {
-		formattedEntities += '\n\nHours\nOpen 24 hours daily, 7 days a week'
-	} else if (place.regularOpeningHours?.periods.length > 1) {
-		formattedEntities += '\n\nHours'
+		let formattedEntities = `${place.displayName.text}\n${cleanedAddress}\n${place.nationalPhoneNumber}`
 
-		// Reorder weekdays to start with Sunday
-		let weekdays = [place.regularOpeningHours.weekdayDescriptions.pop()]
-		weekdays = [...weekdays, ...place.regularOpeningHours.weekdayDescriptions]
+		// If hours are posted and not open 24/7
+		if (place.regularOpeningHours?.periods.length === 1) {
+			formattedEntities += '\n\nHours\nOpen 24 hours daily, 7 days a week'
+		} else if (place.regularOpeningHours?.periods.length > 1) {
+			formattedEntities += '\n\nHours'
 
-		// shorten day name from Sunday -> Sun
-		weekdays = weekdays.map((weekday: string) => weekday.replace(/^(\w{3}).*day:(.*)/, '$1:$2'))
+			// Reorder weekdays to start with Sunday
+			let weekdays = [place.regularOpeningHours.weekdayDescriptions.pop()]
+			weekdays = [...weekdays, ...place.regularOpeningHours.weekdayDescriptions]
 
-		// Combine days with the same hours
-		const mergedDays = weekdays.reduce((result, day) => {
-			const [currentDay, schedule] = day.split(': ');
-			const lastEntry = result[result.length - 1];
+			// shorten day name from Sunday -> Sun
+			weekdays = weekdays.map((weekday: string) => weekday.replace(/^(\w{3}).*day:(.*)/, '$1:$2'))
 
-			if (lastEntry && lastEntry.schedule === schedule) {
-				lastEntry.endDay = currentDay;
-			} else {
-				result.push({ startDay: currentDay, endDay: currentDay, schedule });
-			}
+			// Combine days with the same hours
+			const mergedDays = weekdays.reduce((result, day) => {
+				const [currentDay, schedule] = day.split(': ')
+				const lastEntry = result[result.length - 1]
 
-			return result;
-		}, []);
+				if (lastEntry && lastEntry.schedule === schedule) {
+					lastEntry.endDay = currentDay
+				} else {
+					result.push({ startDay: currentDay, endDay: currentDay, schedule })
+				}
 
-		formattedEntities += mergedDays.map(({ startDay, endDay, schedule }) => {
-			if (startDay === endDay) {
-				return `\n${startDay}: ${schedule}`;
-			} else {
-				return `\n${startDay} - ${endDay}: ${schedule}`;
-			}
-		}).join('')
-	}
+				return result
+			}, [])
 
-	return formattedEntities
+			formattedEntities += mergedDays
+				.map(({ startDay, endDay, schedule }) => {
+					if (startDay === endDay) {
+						return `\n${startDay}: ${schedule}`
+					} else {
+						return `\n${startDay} - ${endDay}: ${schedule}`
+					}
+				})
+				.join('')
+		}
+
+		return formattedEntities
+	})
+	return places.slice(0, 3)
 }
