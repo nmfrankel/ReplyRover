@@ -1,6 +1,6 @@
 import { find } from 'geo-tz'
 import * as KosherZmanim from 'kosher-zmanim'
-import { Zmanim, Zman, formatDate, remindGate } from '../../utils.js'
+import { Zmanim, Zman, formatDate } from '../../utils.js'
 import { DateTime } from 'luxon'
 
 export const generateZmanim = async (location: string, userID: string) => {
@@ -14,8 +14,7 @@ export const generateZmanim = async (location: string, userID: string) => {
 	if (!coordinates || !formatted_address) {
 		const LOCATION_MISSING_ERR =
 			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
-		await remindGate(userID, LOCATION_MISSING_ERR)
-		return
+		return LOCATION_MISSING_ERR
 	}
 
 	const elevationAPI = await fetch(

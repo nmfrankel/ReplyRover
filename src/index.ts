@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
-import { logger, remindGate } from './utils.js'
+import { logger, queRemindGate } from './utils.js'
 
 import { getForcast } from './functions/weather/index.js'
 import { define } from './functions/vocab/index.js'
@@ -36,12 +36,12 @@ app.post('/', async (req, res) => {
 	// Handle new users
 	if (event === 'new_user') {
 		await new Promise((r) => setTimeout(r, 5000))
-		await remindGate(user_id, WELCOME_MSG)
+		await queRemindGate(user_id, WELCOME_MSG)
 	}
 
 	// Ensure that we are dealing with a message
 	if (event !== 'message') return
-	let forceData = false
+	let clamp = false
 
 	let reply = ''
 	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
@@ -52,9 +52,9 @@ app.post('/', async (req, res) => {
 		reply = await define(term ?? 'hello')
 	} else if (message.toLowerCase().startsWith('news')) {
 		reply = 'The news service has been blocked due to spamming.'
-		forceData = true
 	} else if (message.toLowerCase().startsWith('directions')) {
 		reply = await fetchDirections(message)
+		clamp = false
 	} else if (message.toLowerCase().startsWith('lookup')) {
 		reply = await entitySearch(message)
 	} else {
@@ -62,7 +62,7 @@ app.post('/', async (req, res) => {
 		const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 		reply = await generateZmanim(location, user_id)
 	}
-	const remindGateReply = await remindGate(user_id, reply, forceData)
+	const remindGateReply = await queRemindGate(user_id, reply, clamp)
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)

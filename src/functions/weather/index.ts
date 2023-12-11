@@ -1,6 +1,5 @@
 import express from 'express'
 import { mapWindCardinals } from './utils.js'
-import { remindGate } from '../../utils.js'
 
 const router = express.Router()
 const baseURL = 'http://api.openweathermap.org/data/2.5/'
@@ -49,8 +48,7 @@ export const getForcast = async (location: string, userID: string) => {
 	if (!coordinates || !formatted_address) {
 		const LOCATION_MISSING_ERR =
 			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
-		await remindGate(userID, LOCATION_MISSING_ERR)
-		return
+		return LOCATION_MISSING_ERR
 	}
 
 	const endpoint = `${baseURL}onecall?lat=${coordinates.lat}&lon=${coordinates.lng}&units=imperial&units=imperial&exclude=hourly,minutely&appid=${process.env.OPEN_WEATHER_API_KEY}`

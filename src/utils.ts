@@ -15,7 +15,7 @@ export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 }
 
 // The next two functions manage sending out messages
-const sendToRemindGate = async (userID: any, message: string) => {
+const sendViaRemindGate = async (userID: any, message: string) => {
 	await logger('response', userID, 'Unknown', message)
 	fetch(`${process.env.HOST}/message/${userID}`, {
 		method: 'POST',
@@ -31,17 +31,13 @@ const sendToRemindGate = async (userID: any, message: string) => {
 	})
 }
 
-export async function remindGate(userId: any, message: string, multiple = false) {
-	// There is a cap on 300 characters for the message
-	// SO split it up into multiple messages if necessary
+export const queRemindGate = async (userID: string, payload: string | string[], clamp = true) => {
+	const msgs = typeof payload === 'string' ? [payload] : payload
+	const charLimit = 300
+	const chunkRegex = new RegExp(`^[^\\n][\\s\\S]{0,${charLimit}}(?=\\n|$)`, clamp ? 'm' : 'gm')
 
-	// add "g" flag to do send multiple messages
-	const messages = multiple
-		? message.match(/^[\s\S]{0,300}(?=\n|$)/gm)
-		: message.match(/^[\s\S]{0,300}(?=\n|$)/m)
-	for (const msg of messages) {
-		await sendToRemindGate(userId, msg)
-	}
+	const msgChunks = msgs.flatMap((msg) => msg.match(chunkRegex) || [])
+	return msgChunks.map(async (chunk) => await sendViaRemindGate(userID, chunk))
 }
 
 // The next section runs db interactions
