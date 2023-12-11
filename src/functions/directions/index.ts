@@ -1,10 +1,18 @@
-const baseURL = 'https://maps.googleapis.com/maps/api/directions/json'
-
 // https://developers.google.com/maps/documentation/directions/get-directions
 
 interface DirectionResponse {
 	routes: {
 		legs: {
+			distance: {
+				text: string
+				value: number
+			}
+			duration: {
+				text: string
+				value: number
+			}
+			end_address: string
+			start_address: string
 			steps: {
 				distance: {
 					text: string
@@ -25,38 +33,45 @@ interface DirectionResponse {
 	}[]
 }
 
-type StepsType = DirectionResponse['routes'][0]['legs'][0]['steps']
+type TripInfoType = DirectionResponse['routes'][0]['legs'][0]
 
-const styleHtmlToText = (instruction: string) => {
-	return instruction
-		.replace(/<\/?b>/g, '**')
-		.replace('<wbr/>', '')
-		.replace(/<[\w\s]+.*?>/g, '\n- ')
+// tslint:disable-next-line:variable-name
+const cleanHTML = (string: string) => {
+	return string
+		.replace(/<\/?(b|wbr)\/?>/g, '')
+		.replace(/<[\w\s]+.*?>/g, '\n-  ')
 		.replace(/<\/[\w\s]+.*?>/g, '')
-		.replace('**/**', '/')
 }
 
+const formatStep = (step: TripInfoType['steps'][0], stepNumber: number) => {
+	const instructions = cleanHTML(step.html_instructions)
+	const distance = step.distance.text
+	return `\n\n${stepNumber}) ${instructions} [${distance}]`
+}
+
+const baseURL = 'https://maps.googleapis.com/maps/api/directions/json'
+
 export const fetchDirections = async (msg: string) => {
-	// const modes = ['driving', 'walking', 'bicycling', 'transit']
-	const mode = 'driving'
+	const modes = ['driving', 'walking', 'bicycling', 'transit']
+	const mode = modes[0]
 	const origin = '1900 Ave M 11230'
 	const destination = '326%20E%209th%20St,%20Brooklyn,%20NY%2011218'
-	const endpoint = `${baseURL}?origin=${origin}&destination=${destination}&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
+	const endpoint = `${baseURL}?mode=${mode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 
-	const res = await fetch(endpoint)
-	const options: DirectionResponse = await res.json()
-	let steps: StepsType = []
+	const response = await fetch(endpoint)
+	const options: DirectionResponse = await response.json()
+	let tripInfo: TripInfoType
+	let steps: TripInfoType['steps'] = []
 
 	try {
+		tripInfo = options.routes[0].legs[0]
 		steps = options.routes[0].legs[0].steps
 	} catch (err) {
 		return 'An error occured, we could not find a route for your given input at this time.'
 	}
 
-	let formattedDirections = ''
-	for (const step of steps) {
-		formattedDirections += styleHtmlToText(step.html_instructions) + '\n'
-	}
+	let formattedDirections = `Directions for ${tripInfo.start_address} to ${tripInfo.end_address}\n${steps.length} steps | ${tripInfo.duration.text} | ${tripInfo.distance.text}`
+	formattedDirections += steps.map((step, i) => formatStep(step, i + 1)).join('')
 
-	return formattedDirections.slice(0, -1)
+	return formattedDirections
 }
