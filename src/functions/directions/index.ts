@@ -54,8 +54,7 @@ const baseURL = 'https://maps.googleapis.com/maps/api/directions/json'
 export const fetchDirections = async (msg: string) => {
 	const modes = ['driving', 'walking', 'bicycling', 'transit']
 	const mode = modes[0]
-	const origin = '1900 Ave M 11230'
-	const destination = '326%20E%209th%20St,%20Brooklyn,%20NY%2011218'
+	const [origin, destination] = msg.replace('directions ', '').split(' to ')
 	const endpoint = `${baseURL}?mode=${mode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 
 	const response = await fetch(endpoint)
@@ -70,8 +69,10 @@ export const fetchDirections = async (msg: string) => {
 		return 'An error occured, we could not find a route for your given input at this time.'
 	}
 
-	let formattedDirections = `Directions for ${tripInfo.start_address} to ${tripInfo.end_address}\n${steps.length} steps | ${tripInfo.duration.text} | ${tripInfo.distance.text}`
-	formattedDirections += steps.map((step, i) => formatStep(step, i + 1)).join('')
+	let formattedDirections = [
+		`Directions for ${tripInfo.start_address} to ${tripInfo.end_address}\n${steps.length} steps | ${tripInfo.duration.text} | ${tripInfo.distance.text}`
+	]
+	formattedDirections.push(steps.map((step, i) => formatStep(step, i + 1)).join(''))
 
 	return formattedDirections
 }

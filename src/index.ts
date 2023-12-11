@@ -43,7 +43,7 @@ app.post('/', async (req, res) => {
 	if (event !== 'message') return
 	let clamp = false
 
-	let reply = ''
+	let reply: string | string[]
 	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
 		const location = message?.replace('wea?ther ', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 		reply = await getForcast(location, user_id)
