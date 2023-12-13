@@ -38,11 +38,12 @@ export const generateZmanim = async (location: string, userID: string) => {
 	const zmanimList: Zman[] = todaysZmanim.list()
 
 	// Create the starting message
-	let response = `\n${formatted_address}\n${formatDate(
+	let response = `\n${formatted_address}\n- ${formatDate(
 		calendar.getAlos16Point1Degrees(),
 		timeZoneId
-	)}:`
+	)} -\n`
 
+	let hasZmanimToday = false
 	// Loop through the zmanim
 	for (const i of [...Array(zmanimList.length).keys()]) {
 		// If the zman is in the past,
@@ -52,14 +53,18 @@ export const generateZmanim = async (location: string, userID: string) => {
 			// If the next zman is not in the future, skip
 			if (zmanimList[i + 1].time < now) continue
 		}
-		response = response.concat('\n' + zmanimList[i].toStr(timeZoneId))
+		response = response.concat(zmanimList[i].toStr(timeZoneId) + '\n')
+		hasZmanimToday = true
 	}
+
+	// reset if no zmanim are returned for the first day
+	if (!hasZmanimToday) response = formatted_address
 
 	// Add 1 day to the calendar
 	calendar.setDate(calendar.getDate().plus({ days: 1 }))
 	const tommorowsZmanim = new Zmanim(calendar)
 	const tommorowsZmanimList: Zman[] = tommorowsZmanim.list()
-	response += `\n\n${formatDate(calendar.getAlos16Point1Degrees(), timeZoneId)}:`
+	response += `\n- ${formatDate(calendar.getAlos16Point1Degrees(), timeZoneId)} -`
 	for (const i of [...Array(tommorowsZmanimList.length).keys()]) {
 		response = response.concat('\n' + tommorowsZmanimList[i].toStr(timeZoneId))
 	}
