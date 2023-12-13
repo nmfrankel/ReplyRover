@@ -15,9 +15,11 @@ export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 }
 
 // The next two functions manage sending out messages
-const sendViaRemindGate = async (userID: any, message: string) => {
+const sendViaRemindGate = async (userID: any, message: string, delay = 0) => {
 	await logger('response', userID, 'Unknown', message)
-	fetch(`${process.env.HOST}/message/${userID}`, {
+	await new Promise((r) => setTimeout(r, delay))
+
+	const send = await fetch(`${process.env.HOST}/message/${userID}`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',
@@ -29,6 +31,7 @@ const sendViaRemindGate = async (userID: any, message: string) => {
 			filename: null
 		})
 	})
+	return send
 }
 
 export const queRemindGate = async (userID: string, payload: string | string[], clamp = true) => {
@@ -37,7 +40,7 @@ export const queRemindGate = async (userID: string, payload: string | string[], 
 	const chunkRegex = new RegExp(`^[^\\n][\\s\\S]{0,${charLimit}}(?=\\n|$)`, clamp ? 'm' : 'gm')
 
 	const msgChunks = msgs.flatMap((msg) => msg.match(chunkRegex) || [])
-	return msgChunks.map(async (chunk) => await sendViaRemindGate(userID, chunk))
+	return msgChunks.map(async (chunk, idx) => await sendViaRemindGate(userID, chunk, idx * 1500))
 }
 
 // The next section runs db interactions
@@ -51,6 +54,8 @@ const initDB = () => {
 }
 
 export const logger = async (event: string, userID: string, username: string, message: string) => {
+	return {}
+
 	initDB()
 	const entry = await global.prisma.log.create({
 		data: {

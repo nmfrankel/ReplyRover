@@ -41,7 +41,7 @@ app.post('/', async (req, res) => {
 
 	// Ensure that we are dealing with a message
 	if (event !== 'message') return
-	let clamp = false
+	let clamp = true
 
 	let reply: string | string[]
 	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
