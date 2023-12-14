@@ -47,7 +47,7 @@ export const getForcast = async (msg: string) => {
 
 	if (!coordinates || !formatted_address) {
 		const LOCATION_MISSING_ERR =
-			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
+			"An error occured while searching for your requested location. Text 'weather' + zip code or city, state.\nI.e. Weather for Monsey, NY"
 		return LOCATION_MISSING_ERR
 	}
 
@@ -55,7 +55,7 @@ export const getForcast = async (msg: string) => {
 	const rawWeather = await fetch(endpoint)
 
 	if (rawWeather.status !== 200)
-		return 'An error occured while retrieving the weather, try again later.'
+		return `An error occured while retrieving the weather for '${formatted_address}', please try us again later.`
 	const weather = await rawWeather.json()
 	const proTip = `Pro tip: Just text\nWeather for ${location}`
 	let formatted = formatted_address + '\n'

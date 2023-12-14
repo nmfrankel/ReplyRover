@@ -15,7 +15,8 @@ const HELP_MSG = `Here's how our team can assist:
 [Weather] Text 'weather' + zip code or city, state.
 [Zmanim] Text 'zmanim' + your location.
 [Directions] Text 'directions' + where you're leaving from 'to' your destination.
-[Business Info] Text 'lookup' + business name + zip code or city, state.`
+[Business Info] Text 'lookup' + business name + zip code or city, state.
+[Word Definition] Text 'define' +  the word you'd like defined.`
 
 dotenv.config()
 
@@ -43,7 +44,7 @@ app.post('/', async (req, res) => {
 
 	if (event !== 'message') return
 
-	const [command, prompt] = message.toLowerCase().split(/\s+/)
+	const [command, prompt = ''] = message.toLowerCase().split(/\s+(.*)/)
 	let clamp = true
 	let reply: string | string[]
 
@@ -66,7 +67,7 @@ app.post('/', async (req, res) => {
 			break
 
 		case 'news':
-			reply = 'The news service has been blocked due to spamming.'
+			reply = 'The news service has been blocked due inappropriate use of the search feature.'
 			break
 
 		case 'weather':
@@ -80,7 +81,9 @@ app.post('/', async (req, res) => {
 			break
 	}
 
-	const remindGateReply = await queRemindGate(user_id, reply, clamp)
+	if (app.get('env') === 'production') {
+		const remindGateReply = await queRemindGate(user_id, reply, clamp)
+	}
 
 	res.setHeader('content-type', 'text/plain')
 	res.send(reply)

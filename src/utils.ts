@@ -51,11 +51,14 @@ declare global {
 const initDB = () => {
 	const prisma = global.prisma || new PrismaClient()
 	if (process.env.NODE_ENV !== 'production') global.prisma = prisma
+	return prisma
 }
 
 export const logger = async (event: string, userID: string, username: string, message: string) => {
-	initDB()
-	const entry = await global.prisma.log.create({
+	if (process.env.NODE_ENV !== 'production') return {}
+
+	const db = initDB()
+	const entry = await db.log.create({
 		data: {
 			event,
 			userID,

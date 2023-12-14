@@ -2,11 +2,16 @@ const baseURL = 'https://api.dictionaryapi.dev/api/v2/entries/en/'
 
 export const getDefinition = async (msg: string) => {
 	const term = msg.split(/\s/).pop()
+
+	if (!term) {
+		return "Text 'define' +  the word you'd like defined.\n I.e. define the word addition"
+	}
+
 	const endpoint = baseURL + term
 	const rawDefinition = await fetch(endpoint)
 
 	if (rawDefinition.status !== 200)
-		return `An error occured while defining ${term}, try again later.`
+		return `An error occured while defining '${term}'. Text \'define\' +  the word you\'d like defined.\n I.e. define the word addition`
 	const definition = await rawDefinition.json()
 	// const proTip = `Pro tip: Just text\nDefine ${term}`
 

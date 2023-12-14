@@ -53,9 +53,13 @@ const baseURL = 'https://maps.googleapis.com/maps/api/directions/json'
 
 export const fetchDirections = async (msg: string) => {
 	const modes = ['driving', 'walking', 'bicycling', 'transit']
-	const mode = modes[0]
-	const [origin, destination] = msg.replace('directions ', '').split(' to ')
-	const endpoint = `${baseURL}?mode=${mode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
+	const transportMode = modes[0]
+	const [origin, destination] = msg.split(' to ')
+	const endpoint = `${baseURL}?mode=${transportMode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
+
+	if (!origin || !destination) {
+		return `Text \'directions\' + where you're leaving from 'to' your destination.\nI.e. directions from 433 S Pascack Rd to Evergreen Kosher, 10952`
+	}
 
 	const response = await fetch(endpoint)
 	const options: DirectionResponse = await response.json()
@@ -66,7 +70,7 @@ export const fetchDirections = async (msg: string) => {
 		tripInfo = options.routes[0].legs[0]
 		steps = options.routes[0].legs[0].steps
 	} catch (err) {
-		return 'An error occured, we could not find a route for your given input at this time.'
+		return `An error occured while searching for a ${transportMode} route based on your given input. Text \'directions\' + where you're leaving from 'to' your destination.\nI.e. directions from 433 S Pascack Rd to Evergreen Kosher, 10952`
 	}
 
 	const formattedDirections = [

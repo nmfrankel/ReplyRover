@@ -14,7 +14,7 @@ export const generateZmanim = async (msg: string) => {
 
 	if (!coordinates || !formatted_address) {
 		const LOCATION_MISSING_ERR =
-			'An error occured while searching for the requested location. Just send the location name to search. I.e. Monsey, NY'
+			"An error occured while searching for your requested location. Text 'zmanim' + zip code or city, state.\nI.e. Zmanim for Monsey, NY"
 		return LOCATION_MISSING_ERR
 	}
 
