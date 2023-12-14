@@ -16,7 +16,7 @@ export function formatDate(timestamp: DateTime | null, timezoneId: string) {
 
 // The next two functions manage sending out messages
 const sendViaRemindGate = async (userID: any, message: string, delay = 0) => {
-	await logger('response', userID, 'Unknown', message)
+	await logger('response', userID, '[SYSTEM]', message)
 	await new Promise((r) => setTimeout(r, delay))
 
 	const send = await fetch(`${process.env.HOST}/message/${userID}`, {
@@ -54,8 +54,6 @@ const initDB = () => {
 }
 
 export const logger = async (event: string, userID: string, username: string, message: string) => {
-	return {}
-
 	initDB()
 	const entry = await global.prisma.log.create({
 		data: {

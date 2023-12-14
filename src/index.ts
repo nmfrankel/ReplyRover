@@ -11,6 +11,11 @@ import { getForcast } from './functions/weather/index.js'
 import { generateZmanim } from './functions/zmanim/index.js'
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
+const HELP_MSG = `Here's how our team can assist:
+[Weather] Text 'weather' + zip code or city, state.
+[Zmanim] Text 'zmanim' + your location.
+[Directions] Text 'directions' + where you're leaving from 'to' your destination.
+[Business Info] Text 'lookup' + business name + zip code or city, state.`
 
 dotenv.config()
 
@@ -53,7 +58,7 @@ app.post('/', async (req, res) => {
 			break
 
 		case 'help':
-			reply = 'HELP'
+			reply = HELP_MSG
 			break
 
 		case 'lookup':
@@ -71,7 +76,7 @@ app.post('/', async (req, res) => {
 
 		case 'zmanim':
 		default:
-			reply = await generateZmanim(prompt)
+			reply = await generateZmanim(prompt ?? message)
 			break
 	}
 
