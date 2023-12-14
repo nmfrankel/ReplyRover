@@ -1,6 +1,7 @@
 const baseURL = 'https://api.dictionaryapi.dev/api/v2/entries/en/'
 
-export const define = async (term: string) => {
+export const getDefinition = async (msg: string) => {
+	const term = msg.split(/\s/).pop()
 	const endpoint = baseURL + term
 	const rawDefinition = await fetch(endpoint)
 

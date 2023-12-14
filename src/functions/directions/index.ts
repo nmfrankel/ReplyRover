@@ -69,7 +69,7 @@ export const fetchDirections = async (msg: string) => {
 		return 'An error occured, we could not find a route for your given input at this time.'
 	}
 
-	let formattedDirections = [
+	const formattedDirections = [
 		`Directions for ${tripInfo.start_address} to ${tripInfo.end_address}\n${steps.length} steps | ${tripInfo.duration.text} | ${tripInfo.distance.text}`
 	]
 	formattedDirections.push(steps.map((step, i) => formatStep(step, i + 1)).join(''))

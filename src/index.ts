@@ -3,12 +3,12 @@ import express from 'express'
 import cors from 'cors'
 import { logger, queRemindGate } from './utils.js'
 
-import { getForcast } from './functions/weather/index.js'
-import { define } from './functions/vocab/index.js'
-// import { fetchNews } from './functions/news/index.js'
-import { generateZmanim } from './functions/zmanim/index.js'
+import { getDefinition } from './functions/definition/index.js'
 import { fetchDirections } from './functions/directions/index.js'
 import { entitySearch } from './functions/lookup/index.js'
+// import { fetchNews } from './functions/news/index.js'
+import { getForcast } from './functions/weather/index.js'
+import { generateZmanim } from './functions/zmanim/index.js'
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
 
@@ -25,43 +25,56 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', async (req, res) => {
-	// Extract msg info
 	const { event, user_id, user_name, message } = req.body
 
-	// Log the message
 	const logged = await logger(event, user_id, user_name, message)
 	// tslint:disable-next-line:no-console
 	console.log(JSON.stringify(logged))
 
-	// Handle new users
 	if (event === 'new_user') {
 		await new Promise((r) => setTimeout(r, 5000))
 		await queRemindGate(user_id, WELCOME_MSG)
 	}
 
-	// Ensure that we are dealing with a message
 	if (event !== 'message') return
-	let clamp = true
 
+	const [command, prompt] = message.toLowerCase().split(/\s+/)
+	let clamp = true
 	let reply: string | string[]
-	if (message.toLowerCase().startsWith('weather') || message.toLowerCase().startsWith('wether')) {
-		const location = message?.replace('wea?ther ', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
-		reply = await getForcast(location, user_id)
-	} else if (message.toLowerCase().startsWith('define')) {
-		const term = message.split(/\s/).pop()
-		reply = await define(term ?? 'hello')
-	} else if (message.toLowerCase().startsWith('news')) {
-		reply = 'The news service has been blocked due to spamming.'
-	} else if (message.toLowerCase().startsWith('directions')) {
-		reply = await fetchDirections(message)
-		clamp = false
-	} else if (message.toLowerCase().startsWith('lookup')) {
-		reply = await entitySearch(message)
-	} else {
-		// Get the location from the message
-		const location = message?.replace('zmanim', '').replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
-		reply = await generateZmanim(location, user_id)
+
+	switch (command) {
+		case 'define':
+			reply = await getDefinition(prompt)
+			break
+
+		case 'directions':
+			clamp = false
+			reply = await fetchDirections(prompt)
+			break
+
+		case 'help':
+			reply = 'HELP'
+			break
+
+		case 'lookup':
+			reply = await entitySearch(prompt)
+			break
+
+		case 'news':
+			reply = 'The news service has been blocked due to spamming.'
+			break
+
+		case 'weather':
+		case 'wether':
+			reply = await getForcast(prompt)
+			break
+
+		case 'zmanim':
+		default:
+			reply = await generateZmanim(prompt)
+			break
 	}
+
 	const remindGateReply = await queRemindGate(user_id, reply, clamp)
 
 	res.setHeader('content-type', 'text/plain')

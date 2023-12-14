@@ -2,9 +2,7 @@ import type { Place, EntitySearch, RegularOpeningHours } from './types'
 
 // https://developers.google.com/maps/documentation/places/web-service/text-search
 
-export const entitySearch = async (msg: string): Promise<string | string[]> => {
-	const searchTerm = msg.replace(/lookup\s*(?:for\s)?/, '')
-
+export const entitySearch = async (searchTerm: string): Promise<string | string[]> => {
 	if (searchTerm.length < 2) return HELP
 
 	const searchResults = await search(searchTerm)

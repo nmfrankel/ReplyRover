@@ -3,7 +3,8 @@ import * as KosherZmanim from 'kosher-zmanim'
 import { Zmanim, Zman, formatDate } from '../../utils.js'
 import { DateTime } from 'luxon'
 
-export const generateZmanim = async (location: string, userID: string) => {
+export const generateZmanim = async (msg: string) => {
+	const location = msg.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 	)

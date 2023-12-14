@@ -5,7 +5,6 @@ const router = express.Router()
 const baseURL = 'http://api.openweathermap.org/data/2.5/'
 
 export const getCurrent = async (location: string, days = 1) => {
-	// let endpoint = intval(self::$location)? 'weather?zip='.self::$location: 'weather?q='.self::$location;
 	const endpoint = `${baseURL}weather?zip=${location},us&units=imperial&appid=${process.env.OPEN_WEATHER_API_KEY}`
 	const rawWeather = await fetch(endpoint)
 
@@ -37,7 +36,8 @@ Humidity: ${humi}%${wind}\n\n${proTip}`
 	return formattedWeather
 }
 
-export const getForcast = async (location: string, userID: string) => {
+export const getForcast = async (msg: string) => {
+	const location = msg.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
 	)
