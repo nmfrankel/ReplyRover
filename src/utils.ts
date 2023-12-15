@@ -48,16 +48,20 @@ declare global {
 	var prisma: PrismaClient | undefined
 }
 
+let db: PrismaClient | undefined
+
 const initDB = () => {
 	const prisma = global.prisma || new PrismaClient()
 	if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 	return prisma
 }
 
+export const closeDB = async () => await db.$disconnect()
+
 export const logger = async (event: string, userID: string, username: string, message: string) => {
 	if (process.env.NODE_ENV !== 'production') return {}
 
-	const db = initDB()
+	db = initDB()
 	const entry = await db.log.create({
 		data: {
 			event,
@@ -116,7 +120,7 @@ export class Zmanim {
 
 		// Setting in israel to true being that we shoule never return a time for 2nd day yom tov
 		if (clandar.isAssurBemlacha(clandar.getDate().plus({ days: 1 }), clandar.getTzais(), true))
-			this.candleLighting = new Zman(clandar.getCandleLighting(), 'Candle Lighting')
+			this.candleLighting = new Zman(clandar.getCandleLighting(), '- Candle Lighting')
 	}
 
 	list() {

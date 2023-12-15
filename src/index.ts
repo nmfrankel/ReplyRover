@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
-import { logger, queRemindGate } from './utils.js'
+import { closeDB, logger, queRemindGate } from './utils.js'
 
 import { getDefinition } from './functions/definition/index.js'
 import { fetchDirections } from './functions/directions/index.js'
@@ -77,12 +77,13 @@ app.post('/', async (req, res) => {
 
 		case 'zmanim':
 		default:
-			reply = await generateZmanim(prompt ?? message)
+			reply = await generateZmanim(prompt || message)
 			break
 	}
 
 	if (app.get('env') === 'production') {
 		const remindGateReply = await queRemindGate(user_id, reply, clamp)
+		await closeDB()
 	}
 
 	res.setHeader('content-type', 'text/plain')

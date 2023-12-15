@@ -15,7 +15,7 @@ model Log {
   event         String
   userID        String
   username      String
-  message       String
+  message       String?
   timestamp     DateTime @default(now())
 }
 
