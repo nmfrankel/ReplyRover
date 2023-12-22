@@ -9,6 +9,8 @@ import { entitySearch } from './functions/lookup/index.js'
 // import { fetchNews } from './functions/news/index.js'
 import { getForcast } from './functions/weather/index.js'
 import { generateZmanim } from './functions/zmanim/index.js'
+// import { PrismaClient } from '@prisma/client'
+// import * as fs from 'node:fs/promises';
 
 const WELCOME_MSG = 'Welcome to ZmanimBot. Reply with a zipcode or city, state to get zmanim.'
 const HELP_MSG = `Here's how our team can assist:
@@ -26,7 +28,20 @@ const port = process.env.PORT || 8080
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+	// const prisma = global.prisma || new PrismaClient()
+
+	// const log = await prisma.log.findMany({
+	// 	where: {
+	// 		id: {
+	// 			gte: 1570,
+	// 			lte: 1770
+	// 		}
+	// 	}
+	// })
+
+	// await fs.writeFile('./dump.txt', JSON.stringify(log), "utf8")
+
 	res.send('Hello world!')
 })
 
@@ -50,12 +65,14 @@ app.post('/', async (req, res) => {
 
 	switch (command) {
 		case 'define':
-			reply = await getDefinition(prompt)
+			// reply = await getDefinition(prompt)
+			reply = 'The define service has been blocked due false flagging issues.'
 			break
 
 		case 'directions':
 			clamp = false
-			reply = await fetchDirections(prompt)
+			// reply = await fetchDirections(prompt)
+			reply = 'The directions service has been blocked due false flagging issues.'
 			break
 
 		case 'help':
@@ -63,11 +80,12 @@ app.post('/', async (req, res) => {
 			break
 
 		case 'lookup':
-			reply = await entitySearch(prompt)
+			// reply = await entitySearch(prompt)
+			reply = 'The lookup service has been blocked due false flagging issues.'
 			break
 
 		case 'news':
-			reply = 'The news service has been blocked due inappropriate use of the search feature.'
+			reply = 'The news service has been blocked due false flagging issues.'
 			break
 
 		case 'weather':
