@@ -36,7 +36,7 @@ Humidity: ${humi}%${wind}\n\n${proTip}`
 	return formattedWeather
 }
 
-export const getForcast = async (msg: string) => {
+export const getForcast = async (msg: string, days = 6) => {
 	const location = msg.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ')
 	const geocodingAPI = await fetch(
 		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
@@ -61,7 +61,7 @@ export const getForcast = async (msg: string) => {
 	let formatted = formatted_address + '\n'
 
 	weather.daily.forEach((d: any, i: number) => {
-		if (i >= 6) return
+		if (i >= days) return
 
 		const dt = new Date(d.dt * 1000)
 		const dayOfWeek = dt.toLocaleString('en-us', { weekday: 'short' })

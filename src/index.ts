@@ -9,6 +9,7 @@ import { entitySearch } from './functions/lookup/index.js'
 // import { fetchNews } from './functions/news/index.js'
 import { getForcast } from './functions/weather/index.js'
 import { generateZmanim } from './functions/zmanim/index.js'
+import { getHelp } from './functions/bot/index.js'
 // import { PrismaClient } from '@prisma/client'
 // import * as fs from 'node:fs/promises';
 
@@ -29,19 +30,6 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', async (req, res) => {
-	// const prisma = global.prisma || new PrismaClient()
-
-	// const log = await prisma.log.findMany({
-	// 	where: {
-	// 		id: {
-	// 			gte: 1570,
-	// 			lte: 1770
-	// 		}
-	// 	}
-	// })
-
-	// await fs.writeFile('./dump.txt', JSON.stringify(log), "utf8")
-
 	res.send('Hello world!')
 })
 
@@ -64,6 +52,10 @@ app.post('/', async (req, res) => {
 	let reply: string | string[]
 
 	switch (command) {
+		case 'answer':
+			reply = await getHelp(prompt)
+			break
+
 		case 'define':
 			// reply = await getDefinition(prompt)
 			reply = 'The define service has been blocked due false flagging issues.'
