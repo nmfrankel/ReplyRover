@@ -54,51 +54,53 @@ export const getHelp = async (msg: string) => {
 	const model = genAI.getGenerativeModel({
 		model: 'gemini-1.0-pro',
 		generationConfig,
-		safetySettings,
-		tools: {
-			functionDeclarations: [getCurrentWeatherFunctionDeclaration]
-		}
+		safetySettings
+		// tools: {
+		// 	functionDeclarations: [getCurrentWeatherFunctionDeclaration]
+		// }
 	})
 
 	const { totalTokens } = await model.countTokens(msg)
 	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.'
 	console.log('Total tokens:', totalTokens)
 
-	const chat = model.startChat()
 	const prompt = 'Only answer up to 2 sentence to:' + msg
+	const temp_result = await model.generateContent(prompt)
+	const text = temp_result.response.text()
 
-	// Send the message to the model.
-	const result = await chat.sendMessage(prompt)
+	// const chat = model.startChat()
 
-	// For simplicity, this uses the first function call found.
-	const call = result.response.functionCalls()?.[0]
+	// // Send the message to the model.
+	// const result = await chat.sendMessage(prompt)
 
-	if (call) {
-		// Call the executable function named in the function call
-		// with the arguments specified in the function call and
-		// let it call the hypothetical API.
-		const apiResponse = await functions[call.name](call.args)
-		console.log(call.name, call.args)
-		console.log(apiResponse)
+	// // For simplicity, this uses the first function call found.
+	// const call = result.response.functionCalls()?.[0]
 
-		return apiResponse
+	// if (call) {
+	// 	// Call the executable function named in the function call
+	// 	// with the arguments specified in the function call and
+	// 	// let it call the hypothetical API.
+	// 	const apiResponse = await functions[call.name](call.args)
+	// 	console.log(call.name, call.args)
+	// 	console.log(apiResponse)
 
-		// Send the API response back to the model so it can generate
-		// a text response that can be displayed to the user.
-		// const result2 = await chat.sendMessage([{
-		// 	functionResponse: {
-		// 		name: 'getWeatherResponse',
-		// 		response: apiResponse
-		// 	}
-		// }]);
+	// 	return apiResponse
 
-		// Log the text response.
-		// console.log(result2.response.text());
-	}
+	// 	// Send the API response back to the model so it can generate
+	// 	// a text response that can be displayed to the user.
+	// 	// const result2 = await chat.sendMessage([{
+	// 	// 	functionResponse: {
+	// 	// 		name: 'getWeatherResponse',
+	// 	// 		response: apiResponse
+	// 	// 	}
+	// 	// }]);
 
-	// const result = await model.generateContent(prompt);
-	const response = result.response
-	const text = response.text()
+	// 	// Log the text response.
+	// 	// console.log(result2.response.text());
+	// }
+
+	// const response = result.response
+	// const text = response.text()
 
 	return text
 }
