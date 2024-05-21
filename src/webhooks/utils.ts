@@ -45,16 +45,23 @@ export async function event_logger(
 	return entry;
 }
 
-export function que_messages(endpoint: string, payload: string | string[], clamp = true): any {
+export async function que_messages(
+	endpoint: string,
+	payload: string | string[],
+	clamp = true
+): any {
 	const CHAR_LIMIT = 300;
 
 	const msgs = typeof payload === 'string' ? [payload] : payload;
 	const chunkRegex = new RegExp(`^[^\\n][\\s\\S]{0,${CHAR_LIMIT}}(?=\\n|$)`, clamp ? 'm' : 'gm');
 
 	const msgChunks = msgs.flatMap((msg) => msg.match(chunkRegex) || []);
-	return msgChunks.map(
+	const sent_messages = msgChunks.map(
 		async (chunk, idx) => await sendViaRemindGate(endpoint, chunk, idx * 1500)
 	);
+	await closeDB();
+
+	return sent_messages;
 }
 
 // The next two functions manage sending out messages

@@ -1,8 +1,6 @@
 import express from 'express';
+import { function_calling } from '../functions';
 import { event_logger, que_messages } from './utils';
-
-import { getForcast } from '../functions/weather';
-import { generateZmanim } from '../functions/zmanim';
 
 const router = express.Router();
 const HELP_MSG = `Here's how our team can assist:
@@ -17,7 +15,7 @@ router.post('/', async (req, res) => {
 
 	const logged = await event_logger(event, user_id, user_name, message);
 	// tslint:disable-next-line:no-console
-	console.log(`[SYSTEM] New ${event} event logged [${logged.id}]`);
+	console.log(`[SYSTEM] ${event} event logged [${logged.id}]`);
 
 	if (event === 'new_user') {
 		await new Promise((r) => setTimeout(r, 5000));
@@ -26,27 +24,9 @@ router.post('/', async (req, res) => {
 		return;
 	}
 
-	const [command, prompt = ''] = message.toLowerCase().split(/\s+(.*)/);
-	let clamp = true;
-	let reply: string | string[] = 'ALL SYSTEMS NORMAL';
+	let [reply, clamp, completed] = await function_calling(message);
 
-	switch (command) {
-		case 'help':
-			reply = HELP_MSG;
-			break;
-
-		case 'weather':
-		case 'wether':
-			reply = await getForcast(prompt);
-			break;
-
-		case 'zmanim':
-		default:
-			reply = await generateZmanim(prompt || message);
-			break;
-	}
-
-	if (process.env.NODE_ENV !== 'production') {
+	if (process.env.NODE_ENV === 'production') {
 		await que_messages(user_id, reply, clamp);
 	}
 

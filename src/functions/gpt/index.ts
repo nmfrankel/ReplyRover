@@ -1,5 +1,5 @@
-import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai'
-import { getForcast } from '../weather/index.js'
+import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai';
+import { getForcast } from '../weather/index.js';
 
 const generationConfig = {
 	stopSequences: ['red'],
@@ -7,7 +7,7 @@ const generationConfig = {
 	temperature: 0.9,
 	topP: 0.1,
 	topK: 16
-}
+};
 
 const safetySettings = [
 	{
@@ -18,7 +18,7 @@ const safetySettings = [
 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
 		threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
 	}
-]
+];
 
 // Function declaration, to pass to the model.
 const getCurrentWeatherFunctionDeclaration = {
@@ -39,18 +39,18 @@ const getCurrentWeatherFunctionDeclaration = {
 		},
 		required: ['location']
 	}
-}
+};
 
 // Executable function code. Put it in a map keyed by the function name
 // so that you can call it once you get the name string from the model.
 const functions = {
 	getCurrentWeather: ({ location, days }) => {
-		return getForcast(location, days)
+		return getForcast(location, days);
 	}
-}
+};
 
 export const getHelp = async (msg: string) => {
-	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 	const model = genAI.getGenerativeModel({
 		model: 'gemini-1.0-pro',
 		generationConfig,
@@ -58,15 +58,14 @@ export const getHelp = async (msg: string) => {
 		// tools: {
 		// 	functionDeclarations: [getCurrentWeatherFunctionDeclaration]
 		// }
-	})
+	});
 
-	const { totalTokens } = await model.countTokens(msg)
-	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.'
-	console.log('Total tokens:', totalTokens)
+	const { totalTokens } = await model.countTokens(msg);
+	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.';
 
-	const prompt = 'Only answer up to 2 sentence to:' + msg
-	const temp_result = await model.generateContent(prompt)
-	const text = temp_result.response.text()
+	const prompt = 'Only answer up to 2 sentence to:' + msg;
+	const temp_result = await model.generateContent(prompt);
+	const text = temp_result.response.text();
 
 	// const chat = model.startChat()
 
@@ -102,8 +101,10 @@ export const getHelp = async (msg: string) => {
 	// const response = result.response
 	// const text = response.text()
 
-	return text
-}
+	return text;
+};
 
 // msg = `here are services we offer: dictionary, weather, zmanim, news, company info fact checkup and help.
 // Reply which one this sentence most closly matches, Alt reply 'help': What does the forecast say for tomorrow in 10977?`
+
+// https://platform.openai.com/docs/assistants/tools/function-calling/quickstart?lang=node.js
