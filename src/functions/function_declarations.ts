@@ -1,34 +1,35 @@
+import { functionDeclaration as getDirectionsDeclaration, fetchDirections } from './directions';
 import { functionDeclaration as defaultDeclaration, getHelp } from './gpt';
-import { functionDeclaration as getCurrentWeatherDeclaration, getForcast } from './weather';
+import { functionDeclaration as searchEntityDeclaration, entitySearch } from './lookup';
+import { functionDeclaration as getNewsDeclaration, fetchNews } from './news';
+import {
+	getCurrent,
+	functionDeclaration as getCurrentWeatherDeclaration,
+	getForcast
+} from './weather';
 import { functionDeclaration as getZmanimDeclaration, generateZmanim } from './zmanim';
 
+interface Params {
+	[key: string]: string;
+}
+
 export const functionDeclarations = [
+	getDirectionsDeclaration,
+	searchEntityDeclaration,
+	getNewsDeclaration,
 	getCurrentWeatherDeclaration,
 	getZmanimDeclaration,
 	defaultDeclaration
 ];
 
-// Executable function code. Put it in a map keyed by the function name
-// so that you can call it once you get the name string from the model.
 export const functions = {
-	getCurrentWeather: ({ location, days }) => getForcast(location, days),
-	// getWeatherForcast: ({ location, days }) => {
-	// 	return false;
-	// },
-	getZmanim: ({ location }) => generateZmanim(location),
-	// getNews: ({ topic, filters }) => {
-	// 	return false;
-	// },
-	// searchEntity: ({ entity }) => {
-	// 	return entitySearch(entity);
-	// },
-	// entityLookup: ({ entity }) => {
-	// 	return entitySearch(entity);
-	// },
-	// getDirections: ({ from, to }) => {
-	// 	return false;
-	// },
-	getHelp: ({ prompt }) => getHelp(prompt)
+	getDirections: ({ origin, destination }: Params) => fetchDirections(origin, destination),
+	searchEntity: ({ entity }: Params) => entitySearch(entity),
+	getNews: ({ topic, filters }: Params) => fetchNews(`${topic}%20${filters}`),
+	getWeather: ({ location, days }: { location: string; days: number }) =>
+		days === 1 ? getCurrent(location, days) : getForcast(location, days),
+	getZmanim: ({ location }: Params) => generateZmanim(location),
+	getHelp: ({ prompt }: Params) => getHelp(prompt)
 };
 
 // msg = `here are services we offer: dictionary, weather, zmanim, news, company info fact checkup and help.

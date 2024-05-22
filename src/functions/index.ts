@@ -38,8 +38,9 @@ export async function function_calling(prompt: string) {
 	const call = result.response.functionCalls()?.[0];
 
 	if (call) {
-		const message = await functions[call.name](call.args);
+		// tslint:disable-next-line:no-console
 		console.log(call.name, call.args);
+		const message = await functions[call.name](call.args);
 
 		return [message, clamp, completed];
 	}

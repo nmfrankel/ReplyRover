@@ -1,5 +1,5 @@
 interface CardinalDirections {
-	[key: string]: [number, number]
+	[key: string]: [number, number];
 }
 
 const cardinalDirections: CardinalDirections = {
@@ -20,19 +20,19 @@ const cardinalDirections: CardinalDirections = {
 	WNW: [281.25, 303.75],
 	NW: [303.75, 326.25],
 	NNW: [326.25, 348.75]
-}
+};
 
 export const mapWindCardinals = (angle: number) => {
 	// tslint:disable-next-line:forin
 	for (const direction in cardinalDirections) {
-		const [min, max] = cardinalDirections[direction]
+		const [min, max] = cardinalDirections[direction];
 		if ((angle >= min && angle <= max) || (max < min && (angle >= min || angle <= max))) {
-			return direction === 'N1' || direction === 'N2' ? 'N' : direction
+			return direction === 'N1' || direction === 'N2' ? 'N' : direction;
 		}
 	}
 
-	return 'Unknown'
-}
+	return 'Unknown';
+};
 
 // Example usage
 // const angle = 30 // Replace with your angle

@@ -1,25 +1,25 @@
-import type { Place, EntitySearch, RegularOpeningHours } from './types'
+import type { Place, EntitySearch, RegularOpeningHours } from './types';
 
 // https://developers.google.com/maps/documentation/places/web-service/text-search
 
-export const entitySearch = async (searchTerm: string): Promise<string | string[]> => {
-	if (searchTerm.length < 2) return HELP
+const HELP =
+	'Start the message with "lookup" followed by the [company name], [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701';
 
-	const searchResults = await search(searchTerm)
+export const entitySearch = async (searchTerm: string): Promise<string | string[]> => {
+	if (searchTerm.length < 2) return HELP;
+
+	const searchResults = await search(searchTerm);
 
 	if (searchResults.error) {
-		return `An unknown error occured while looking up your search. Please try again later.\n\n${HELP}`
+		return `An unknown error occured while looking up your search. Please try again later.\n\n${HELP}`;
 	} else if (!searchResults.places || !searchResults.places.length) {
-		return `No lookup matches found for "${searchTerm}". Please check your input and try again.\n\n${HELP}`
+		return `No lookup matches found for "${searchTerm}". Please check your input and try again.\n\n${HELP}`;
 	}
 
-	const places = searchResults.places.slice(0, 3).map(formatEntity)
+	const places = searchResults.places.slice(0, 3).map(formatEntity);
 
-	return places
-}
-
-const HELP =
-	'Start the message with "lookup" followed by the [company name], [city, state or zipcode].\nI.e. Lookup Beth Medrash Govoha, 08701'
+	return places;
+};
 
 const search = async (searchTerm: string): Promise<EntitySearch> => {
 	try {
@@ -35,11 +35,11 @@ const search = async (searchTerm: string): Promise<EntitySearch> => {
 				textQuery: searchTerm,
 				languageCode: 'en'
 			})
-		})
-		return response.json()
+		});
+		return response.json();
 	} catch (err) {
 		// tslint:disable-next-line:no-console
-		console.error('[RETRIEVAL_ERROR]: ', err)
+		console.error('[RETRIEVAL_ERROR]: ', err);
 		return {
 			error: {
 				code: 0,
@@ -47,62 +47,78 @@ const search = async (searchTerm: string): Promise<EntitySearch> => {
 				status: 'RETRIEVAL_ERROR'
 			},
 			places: undefined
-		}
+		};
 	}
-}
+};
 
 const formatEntity = (place: Place): string => {
-	const { displayName, formattedAddress, nationalPhoneNumber, regularOpeningHours } = place
-	const modifiedAddress = formattedAddress.replace(', ', '\n')
+	const { displayName, formattedAddress, nationalPhoneNumber, regularOpeningHours } = place;
+	const modifiedAddress = formattedAddress.replace(', ', '\n');
 
-	let formattedEntity = `${displayName.text}\n${modifiedAddress}\n${nationalPhoneNumber}`
-	formattedEntity += formatHours(regularOpeningHours)
+	let formattedEntity = `${displayName.text}\n${modifiedAddress}\n${nationalPhoneNumber}`;
+	formattedEntity += formatHours(regularOpeningHours);
 
-	return formattedEntity
-}
+	return formattedEntity;
+};
 
 const formatHours = (hours: RegularOpeningHours): string => {
-	if (!hours || hours.periods.length === 0) return
-	else if (hours.periods.length === 1) return '\n\nHours\nOpen 24 hours daily, 7 days a week'
+	if (!hours || hours.periods.length === 0) return;
+	else if (hours.periods.length === 1) return '\n\nHours\nOpen 24 hours daily, 7 days a week';
 
-	const isOpenNow = hours.openNow ? 'open' : 'closed'
-	let formattedHours = `\n\nHours ~ currently ${isOpenNow}\n`
+	const isOpenNow = hours.openNow ? 'open' : 'closed';
+	let formattedHours = `\n\nHours ~ currently ${isOpenNow}\n`;
 
 	// Shorten day name from Sunday -> Sun
 	const schedule = hours.weekdayDescriptions.map((day) =>
 		day.replace(/^(\w{3}).*day:(.*)/, '$1:$2')
-	)
+	);
 
 	// Move the last element (Sunday hours) to the beginning of the array
-	const sundaySchedule = schedule.pop()
-	schedule.unshift(sundaySchedule)
+	const sundaySchedule = schedule.pop();
+	schedule.unshift(sundaySchedule);
 
-	formattedHours += groupDaysByHours(schedule).join('\n')
+	formattedHours += groupDaysByHours(schedule).join('\n');
 
-	return formattedHours
-}
+	return formattedHours;
+};
 
 // Only works for days with overlap consecutively
 const groupDaysByHours = (schedule: string[]): string[] => {
-	const groupedByHours: { [hours: string]: string[] } = {}
-	const uniqueHours: string[] = []
+	const groupedByHours: { [hours: string]: string[] } = {};
+	const uniqueHours: string[] = [];
 
 	schedule.forEach((daySchedule) => {
-		const [day, hours] = daySchedule.split(': ')
-		const daysWithOverlap: string[] = (groupedByHours[hours] || []).concat(day)
-		groupedByHours[hours] = daysWithOverlap
+		const [day, hours] = daySchedule.split(': ');
+		const daysWithOverlap: string[] = (groupedByHours[hours] || []).concat(day);
+		groupedByHours[hours] = daysWithOverlap;
 
 		if (!uniqueHours.includes(hours)) {
-			uniqueHours.push(hours)
+			uniqueHours.push(hours);
 		}
-	})
+	});
 
 	const formattedGroupedDays = uniqueHours.map((hours: string) => {
-		const days = groupedByHours[hours]
+		const days = groupedByHours[hours];
 		return days.length > 1
 			? `${days[0]} - ${days[days.length - 1]}: ${hours}`
-			: `${days[0]}: ${hours}`
-	})
+			: `${days[0]}: ${hours}`;
+	});
 
-	return formattedGroupedDays
-}
+	return formattedGroupedDays;
+};
+
+export const functionDeclaration = {
+	name: 'searchEntity',
+	description: 'This function allows a user to search for a business entity information.',
+	parameters: {
+		type: 'OBJECT',
+		properties: {
+			entity: {
+				type: 'STRING',
+				description:
+					'Company name with any identifiers like address or location information'
+			}
+		},
+		required: ['entity']
+	}
+};
