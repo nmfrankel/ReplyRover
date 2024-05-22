@@ -1,7 +1,7 @@
 import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai';
 
 const generationConfig = {
-	stopSequences: ['red'],
+	stopSequences: ['_'],
 	maxOutputTokens: 200,
 	temperature: 0.9,
 	topP: 0.1,
@@ -30,7 +30,7 @@ export const getHelp = async (msg: string) => {
 	const { totalTokens } = await model.countTokens(msg);
 	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.';
 
-	const prompt = 'limit answer to 3 sentences:' + msg;
+	const prompt = 'limit answer to 3 full sentences:' + msg;
 	const result = await model.generateContent(prompt);
 	const text = result.response.text();
 

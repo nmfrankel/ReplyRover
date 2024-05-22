@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
 		return;
 	}
 
-	let [reply, clamp, completed] = await function_calling(message);
+	const [reply, clamp, completed] = await function_calling(message);
 
 	if (process.env.NODE_ENV === 'production') {
 		await que_messages(user_id, reply, clamp);
