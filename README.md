@@ -1,20 +1,30 @@
-# Zmanim Server
+# Reply Rover
 
-Zmanin-server is a webhook server that listens for incoming SMS traffic and processes requests for zmanim based on the provided location. It then responds with the zmanim for the next 24 hours. This server is designed to work in conjunction with [remind-gate](https://github.com/dickermoshe/remind-gate).
+Reply Rover is a webhook server designed to handle incoming SMS traffic. It acts as a personal assistant accessible through SMS, providing assistance on a wide range of topics. Some of the tasks it can help with include:
+
+-   Directions: Reply Rover can provide directions to specific locations.
+-   Entity Lookup: Reply Rover can retrieve information from Wikipedia about various entities.
+-   News: Reply Rover can fetch the latest news updates.
+-   Weather: Reply Rover can provide current weather conditions and forecasts.
+-   Zmanim: Reply Rover can provide information about Jewish prayer times (zmanim).
+
+This server is designed to work in conjunction with [remind-gate](https://github.com/dickermoshe/remind-gate) SMS gateway, enhancing its functionality and providing additional features.
 
 ## Development
 
 To set up the project for development and make modifications, follow these three steps:
 
-1. Edit the `.env` file and ensure that the correct values are set. You can refer to the `.env.example` file for the expected format.
-1. Install the required packages by running `npm install`.
-1. Start the server using `npm run dev`.
+1. Edit the `.env` file and ensure that the correct values are set. Refer to the `.env.example` file for the expected format and API key instructions.
+2. Install the required packages by running `npm install`.
+3. Start the server using `npm run dev`.
 
 ## Deployment
 
-To deploy the Zmanim Server, follow these steps:
+To deploy Reply Rover, follow these steps:
 
 1. Edit the `.env` file and ensure that the correct values are set. You can refer to the `.env.example` file for the expected format.
-1. Build the Docker image by running `docker build --tag zmanim-server .`, and then run the container with `docker run --rm -i -t -p 80:80 zmanim-server:latest`.
+2. Build the Docker image by running `docker build --tag reply-rover .`, and then run the container with `docker run --rm -i -t -p 80:80 reply-rover:latest`.
 
-> powered by [`Express.js`](https://expressjs.com/).
+<!-- ## What I Exercised/Learned -->
+
+> powered by [`Express.js`](https://expressjs.com/)..
