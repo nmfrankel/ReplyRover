@@ -45,11 +45,7 @@ export async function event_logger(
 	return entry;
 }
 
-export async function que_messages(
-	endpoint: string,
-	payload: string | string[],
-	clamp = true
-): any {
+export async function que_messages(endpoint: string, payload: string | string[], clamp = true) {
 	const CHAR_LIMIT = 300;
 
 	const msgs = typeof payload === 'string' ? [payload] : payload;
@@ -69,7 +65,7 @@ async function sendViaRemindGate(userID: any, message: string, delay = 0) {
 	await event_logger('response', userID, '[SYSTEM]', message);
 	await new Promise((r) => setTimeout(r, delay));
 
-	const send = await fetch(`${process.env.HOST}/message/${userID}`, {
+	return await fetch(`${process.env.HOST}/message/${userID}`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',
@@ -81,5 +77,4 @@ async function sendViaRemindGate(userID: any, message: string, delay = 0) {
 			filename: null
 		})
 	});
-	return send;
 }
