@@ -29,7 +29,7 @@ export const functions = {
 	getWeather: ({ location, days }: { location: string; days: number }) =>
 		days === 1 ? getCurrent(location, days) : getForcast(location, days),
 	getZmanim: ({ location }: Params) => generateZmanim(location),
-	getHelp: ({ prompt }: Params) => getHelp(prompt)
+	default: ({ prompt }: Params) => getHelp(prompt)
 };
 
 // msg = `here are services we offer: dictionary, weather, zmanim, news, company info fact checkup and help.

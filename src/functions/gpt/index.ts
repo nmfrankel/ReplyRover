@@ -38,8 +38,9 @@ export const getHelp = async (msg: string) => {
 };
 
 export const functionDeclaration = {
-	name: 'getHelp',
-	description: 'Answer general questions or if no other function call is found for the prompt.',
+	name: 'default',
+	description:
+		'This function is a jack of all trades. Use as fallback to answer any question or specific task, if no other function call is found for the prompt.',
 	parameters: {
 		type: 'OBJECT',
 		properties: {
