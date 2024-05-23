@@ -16,37 +16,44 @@ export async function function_calling(prompt: string) {
 	let clamp = true;
 	let completed = false;
 
-	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-	const model = genAI.getGenerativeModel({
-		model: 'gemini-1.0-pro',
-		safetySettings,
-		tools: {
-			functionDeclarations
+	try {
+		const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+		const model = genAI.getGenerativeModel({
+			model: 'gemini-1.0-pro',
+			safetySettings,
+			tools: {
+				functionDeclarations
+			}
+		});
+
+		const { totalTokens } = await model.countTokens(prompt);
+		if (totalTokens > 100) {
+			console.log('Total tokens:', totalTokens);
+			return 'Your message is too long. Please shorten and try again.';
 		}
-	});
 
-	const { totalTokens } = await model.countTokens(prompt);
-	if (totalTokens > 100) {
-		console.log('Total tokens:', totalTokens);
-		return 'Your message is too long. Please shorten and try again.';
-	}
+		const chat = model.startChat();
+		const result = await chat.sendMessage(prompt);
 
-	const chat = model.startChat();
-	const result = await chat.sendMessage(prompt);
+		// For simplicity, this uses the first function call found.
+		const call = result.response.functionCalls()?.[0];
 
-	// For simplicity, this uses the first function call found.
-	const call = result.response.functionCalls()?.[0];
+		if (call) {
+			// tslint:disable-next-line:no-console
+			console.log(call.name, call.args);
+			const message = await functions[call.name](call.args);
 
-	if (call) {
-		// tslint:disable-next-line:no-console
-		console.log(call.name, call.args);
-		const message = await functions[call.name](call.args);
+			return [message, clamp, completed];
+		}
+
+		const message = result.response.text();
+		completed = false;
 
 		return [message, clamp, completed];
+	} catch (error) {
+		console.error(error.message);
+
+		const ERROR = '[SYSTEM] An error occured, please try agian.';
+		return [ERROR, clamp, completed];
 	}
-
-	const message = result.response.text();
-	completed = false;
-
-	return [message, clamp, completed];
 }

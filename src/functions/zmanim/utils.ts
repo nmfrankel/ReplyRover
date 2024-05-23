@@ -7,12 +7,6 @@ export function formatTime(timestamp: DateTime | null, timezoneId: string) {
 	return timestamp.toFormat('h:mm');
 }
 
-export function formatDate(timestamp: DateTime | null, timezoneId: string) {
-	if (!timestamp) return 'N/A';
-	timestamp = timestamp.setZone(timezoneId);
-	return timestamp.toFormat('EEE MM/dd');
-}
-
 /* tslint:disable:max-classes-per-file */
 export class Zman {
 	time: DateTime;

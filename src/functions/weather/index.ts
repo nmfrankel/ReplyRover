@@ -1,27 +1,20 @@
+import { formatDate, geocode } from '../library.js';
 import { mapWindCardinals } from './utils.js';
 
 const baseURL = 'https://api.openweathermap.org/data/2.5';
 
 export const getCurrent = async (location: string, days = 1) => {
-	location = location.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ');
-	const geocodingAPI = await fetch(
-		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
-	);
-	const geoRes = await geocodingAPI.json();
-	const coordinates = geoRes.results[0]?.geometry.location;
-	const formatted_address = geoRes.results[0]?.formatted_address;
+	const [error, locationData] = await geocode(location);
 
-	if (!coordinates || !formatted_address) {
-		const LOCATION_MISSING_ERR =
-			"An error occured while searching for your requested location. Text 'weather' + zip code or city, state.\nI.e. Weather for Monsey, NY";
-		return LOCATION_MISSING_ERR;
+	if (error) {
+		return error;
 	}
 
-	const endpoint = `${baseURL}/weather?lat=${coordinates.lat}&lon=${coordinates.lng}&units=imperial&appid=${process.env.OPEN_WEATHER_API_KEY}`;
+	const endpoint = `${baseURL}/weather?lat=${locationData.lat}&lon=${locationData.lng}&units=imperial&appid=${process.env.OPEN_WEATHER_API_KEY}`;
 	const rawWeather = await fetch(endpoint);
 
 	if (rawWeather.status !== 200)
-		return `An error occured while retrieving the weather '${formatted_address}', try again later.`;
+		return `An error occured while retrieving the weather '${locationData.formatted_address}', try again later.`;
 	const weather = await rawWeather.json();
 
 	// simplify values
@@ -36,7 +29,7 @@ export const getCurrent = async (location: string, days = 1) => {
 	const dire = mapWindCardinals(weather.wind.deg);
 	const wind = windS > 2 ? `\nWind: ${windS} MPH ${dire}` : '';
 
-	const formattedWeather = `${formatted_address}
+	const formattedWeather = `${locationData.formatted_address}
 -- CURRENT --
 Temp: ${temp}°
 Feels like: ${feel}°
@@ -47,40 +40,30 @@ Humidity: ${humi}%${wind}`;
 };
 
 export const getForcast = async (location: string, days = 6) => {
-	location = location.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ');
-	const geocodingAPI = await fetch(
-		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
-	);
-	const geoRes = await geocodingAPI.json();
-	const coordinates = geoRes.results[0]?.geometry.location;
-	const formatted_address = geoRes.results[0]?.formatted_address;
+	const [error, locationData] = await geocode(location);
 
-	if (!coordinates || !formatted_address) {
-		const LOCATION_MISSING_ERR =
-			"An error occured while searching for your requested location. Text 'weather' + zip code or city, state.\nI.e. Weather for Monsey, NY";
-		return LOCATION_MISSING_ERR;
+	if (error) {
+		return error;
 	}
 
-	const endpoint = `${baseURL}/onecall?lat=${coordinates.lat}&lon=${coordinates.lng}&units=imperial&units=imperial&exclude=hourly,minutely&appid=${process.env.OPEN_WEATHER_API_KEY}`;
+	const endpoint = `${baseURL}/onecall?lat=${locationData.lat}&lon=${locationData.lng}&units=imperial&units=imperial&exclude=hourly,minutely&appid=${process.env.OPEN_WEATHER_API_KEY}`;
 	const rawWeather = await fetch(endpoint);
 
 	if (rawWeather.status !== 200)
-		return `An error occured while retrieving the weather for '${formatted_address}', please try us again later.`;
+		return `An error occured while retrieving the weather for '${locationData.formatted_address}', please try us again later.`;
 	const weather = await rawWeather.json();
-	let formatted = formatted_address + '\n';
+	let formatted = locationData.formatted_address + '\n';
 
 	weather.daily.forEach((d: any, i: number) => {
 		if (i >= days) return;
 
 		const dt = new Date(d.dt * 1000);
-		const dayOfWeek = dt.toLocaleString('en-us', { weekday: 'short' });
-		const month = dt.getMonth() + 1;
-		const day = dt.getDate().toString().padStart(2, '0');
+		const formatted_date = formatDate(dt);
 		const high = Math.round(d.temp.max);
 		const low = Math.round(d.temp.min);
 		const desc = d.weather?.[0].description;
 
-		formatted += `${dayOfWeek} ${month}/${day} | ${low}° - ${high}° ${desc}\n`;
+		formatted += `${formatted_date} | ${low}° - ${high}° ${desc}\n`;
 	});
 
 	return formatted;

@@ -1,35 +1,31 @@
 import { find } from 'geo-tz';
 import * as KosherZmanim from 'kosher-zmanim';
-import { Zmanim, Zman, formatDate } from './utils.js';
 import { DateTime } from 'luxon';
+import { Zmanim, Zman } from './utils.js';
+import { geocode, formatDate } from '../library.js';
 
-export const generateZmanim = async (msg: string) => {
-	const location = msg.replace(/la?ke?wo?o?d/i, 'Lakewood, NJ');
-	const geocodingAPI = await fetch(
-		`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&region=us&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
-	);
-	const geoRes = await geocodingAPI.json();
-	const coordinates = geoRes.results[0]?.geometry.location;
-	const formatted_address = geoRes.results[0]?.formatted_address;
+export const generateZmanim = async (location: string) => {
+	const [error, locationData] = await geocode(location);
 
-	if (!coordinates || !formatted_address) {
-		const LOCATION_MISSING_ERR =
-			"An error occured while searching for your requested location. Text 'zmanim' + zip code or city, state.\nI.e. Zmanim for Monsey, NY";
-		return LOCATION_MISSING_ERR;
+	if (error) {
+		return error;
 	}
 
-	const elevationAPI = await fetch(
-		`https://maps.googleapis.com/maps/api/elevation/json?locations=${coordinates.lat},${coordinates.lng}&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`
-	);
-	const elvRes = await elevationAPI.json();
+	const baseURL = 'https://maps.googleapis.com/maps/api';
+	const endpoint = `${baseURL}/elevation/json?
+	locations=${locationData.lat},${locationData.lng}&
+	key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`;
+
+	const elevationResponse = await fetch(endpoint);
+	const elvRes = await elevationResponse.json();
 	const elevation = elvRes.results[0].elevation;
-	const timeZoneId = find(coordinates.lat, coordinates.lng)[0];
+	const timeZoneId = find(locationData.lat, locationData.lng)[0];
 
 	// Init location for zmanim
 	const geolocation = new KosherZmanim.GeoLocation(
-		formatted_address,
-		coordinates.lat,
-		coordinates.lng,
+		locationData.formatted_address,
+		locationData.lat,
+		locationData.lng,
 		elevation,
 		timeZoneId
 	);
@@ -39,7 +35,7 @@ export const generateZmanim = async (msg: string) => {
 	const zmanimList: Zman[] = todaysZmanim.list();
 
 	// Create the starting message
-	let response = `\n${formatted_address}\n- ${formatDate(
+	let response = `\n${locationData.formatted_address}\n- ${formatDate(
 		calendar.getAlos16Point1Degrees(),
 		timeZoneId
 	)} -\n`;
@@ -59,7 +55,7 @@ export const generateZmanim = async (msg: string) => {
 	}
 
 	// reset if no zmanim are returned for the first day
-	if (!hasZmanimToday) response = formatted_address;
+	if (!hasZmanimToday) response = locationData.formatted_address;
 
 	// Add 1 day to the calendar
 	calendar.setDate(calendar.getDate().plus({ days: 1 }));
@@ -75,7 +71,7 @@ export const generateZmanim = async (msg: string) => {
 
 export const functionDeclaration = {
 	name: 'getZmanim',
-	description: 'Get zmanim for a given location, with the option for a specified time.',
+	description: 'Get zmanim for a given location, with the optional day count.',
 	parameters: {
 		type: 'OBJECT',
 		properties: {
