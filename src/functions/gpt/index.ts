@@ -1,4 +1,5 @@
 import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 
 const generationConfig = {
 	stopSequences: ['_'],
@@ -31,24 +32,24 @@ export const getHelp = async (msg: string) => {
 	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.';
 
 	const prompt = 'limit answer to 3 full sentences:' + msg;
-	const result = await model.generateContent(prompt);
-	const text = result.response.text();
+	let response = '';
 
-	return text;
+	try {
+		const result = await model.generateContent(prompt);
+		response = result.response.text();
+	} catch (error) {
+		response = error.message;
+	}
+
+	return response;
 };
 
-export const functionDeclaration = {
-	name: 'default',
-	description:
-		'This function is a jack of all trades. Use as fallback to answer any question or specific task, if no other function call is found for the prompt.',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			prompt: {
-				type: 'STRING',
-				description: 'return the input string.'
-			}
-		},
-		required: ['prompt']
-	}
+export const helper = {
+	descirption:
+		'This tool can provide provide for anything not under directions, news, searchEntity, weather or zmanim.',
+	parameters: z.object({
+		prompt: z.string().optional().describe('pass original input string.')
+	}),
+	execute: async ({ prompt }: any) => await getHelp(prompt)
+	// execute: async (data) => console.log('default tool', data)
 };

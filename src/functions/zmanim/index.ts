@@ -3,6 +3,7 @@ import * as KosherZmanim from 'kosher-zmanim';
 import { DateTime } from 'luxon';
 import { Zmanim, Zman } from './utils.js';
 import { geocode, formatDate } from '../library.js';
+import { z } from 'zod';
 
 export const generateZmanim = async (location: string) => {
 	const [error, locationData] = await geocode(location);
@@ -69,22 +70,17 @@ export const generateZmanim = async (location: string) => {
 	return response;
 };
 
-export const functionDeclaration = {
-	name: 'getZmanim',
-	description: 'Get zmanim for a given location, with the optional day count.',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			location: {
-				type: 'STRING',
-				description:
-					'location to get the zmanim for. Can be a zip code, city, or other location identifier.'
-			},
-			days: {
-				type: 'INTEGER',
-				description: 'Number of days to get the forecast for.'
-			}
-		},
-		required: ['location']
-	}
+export const zmanim = {
+	descirption: 'Get zmanim for a given location, with the optional day count.',
+	parameters: z.object({
+		location: z.string().describe("User's location"),
+		days: z
+			.number()
+			.min(0)
+			.max(7)
+			.describe(
+				'Count of days to return in the forecast. If not explictly defined, it will return 0 days.'
+			)
+	}),
+	execute: async ({ location, days, unit }: any) => await generateZmanim(location)
 };

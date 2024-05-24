@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { Place, EntitySearch, RegularOpeningHours } from './types';
 
 // https://developers.google.com/maps/documentation/places/web-service/text-search
@@ -107,18 +108,12 @@ const groupDaysByHours = (schedule: string[]): string[] => {
 	return formattedGroupedDays;
 };
 
-export const functionDeclaration = {
-	name: 'searchEntity',
-	description: 'This function allows a user to search for a business entity information.',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			entity: {
-				type: 'STRING',
-				description:
-					'Company name with any identifiers like address or location information'
-			}
-		},
-		required: ['entity']
-	}
+export const searchEntity = {
+	descirption: 'This function allows a user to search for a business entity information.',
+	parameters: z.object({
+		entity: z
+			.string()
+			.describe('Company name with any identifiers like address or location information')
+	}),
+	execute: async ({ entity }: any) => await entitySearch(entity)
 };

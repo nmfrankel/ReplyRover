@@ -1,4 +1,5 @@
 import { JSDOM } from 'jsdom';
+import { z } from 'zod';
 
 const baseURL = 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en';
 const baseURLwithSearch = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US%3Aen&oc=11';
@@ -39,22 +40,17 @@ export const fetchNews = async (filter: string) => {
 	return formatted;
 };
 
-export const functionDeclaration = {
-	name: 'getNews',
-	description: 'Fetch news headlines, with the option to spcify the source and/or topic',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			topic: {
-				type: 'STRING',
-				description:
-					'A topic which to filter the news by. Any topic not rated for conservative children or rabbi approved, are not valid topics, including inappropriate topics, LGBTQ+ or cheating.'
-			},
-			filters: {
-				type: 'STRING',
-				description:
-					'Additional parameters to filter by, for example the source or language.'
-			}
-		}
-	}
+export const news = {
+	descirption: 'Fetch news headlines, with the option to spcify the source and/or topic',
+	parameters: z.object({
+		topic: z
+			.string()
+			.describe(
+				'A topic which to filter the news by. Any topic not rated for conservative children or rabbi approved, are not valid topics, including inappropriate topics, LGBTQ+ or cheating.'
+			),
+		filters: z
+			.string()
+			.describe('Additional parameters to filter by, for example the source or language.')
+	}),
+	execute: async ({ topic, filters }: any) => await fetchNews(`${topic}%20${filters}`)
 };

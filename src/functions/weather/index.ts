@@ -1,9 +1,10 @@
-import { formatDate, geocode } from '../library.js';
-import { mapWindCardinals } from './utils.js';
+import { z } from 'zod';
+import { formatDate, geocode } from '../library';
+import { mapWindCardinals } from './utils';
 
 const baseURL = 'https://api.openweathermap.org/data/2.5';
 
-export const getCurrent = async (location: string, days = 1) => {
+export const getCurrent = async (location: string) => {
 	const [error, locationData] = await geocode(location);
 
 	if (error) {
@@ -69,23 +70,21 @@ export const getForcast = async (location: string, days = 6) => {
 	return formatted;
 };
 
-export const functionDeclaration = {
-	name: 'getWeather',
-	description: 'Get the weather for a given location, with the option for a specified time.',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			location: {
-				type: 'STRING',
-				description:
-					'location to get the weather for. Can be a zip code, city, or other location identifier.'
-			},
-			days: {
-				type: 'INTEGER',
-				description:
-					'Number of days to get the forecast for. If current or now then days should equal one.'
-			}
-		},
-		required: ['location']
-	}
+export const weather = {
+	descirption: "Get weather for user's requested location",
+	parameters: z.object({
+		location: z.string().describe("User's location"),
+		days: z
+			.number()
+			.min(0)
+			.max(7)
+			.describe(
+				'Count of days to return in the forecast. If not explictly defined, it will return 0 days.'
+			),
+		unit: z
+			.enum(['C', 'F'])
+			.describe('The unit to display the temperature in, based on location.')
+	}),
+	execute: async ({ location, days, unit }: any) =>
+		days === 1 ? await getCurrent(location) : await getForcast(location, days || 6)
 };

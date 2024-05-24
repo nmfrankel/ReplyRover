@@ -1,59 +1,71 @@
-import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai';
-import { functionDeclarations, functions } from './function_declarations';
+import { google } from '@ai-sdk/google';
+import { CoreMessage, generateText } from 'ai';
+import { helper } from './gpt';
+import { directions } from './directions';
+import { searchEntity } from './lookup';
+import { news } from './news';
+import { weather } from './weather';
+import { zmanim } from './zmanim';
 
-const safetySettings = [
-	{
-		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-		threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
-	},
-	{
-		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-		threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
-	}
+const messages: CoreMessage[] = [
+	// {
+	// 	role: 'user',
+	// 	content: 'weather forcast'
+	// },
+	// {
+	// 	role: 'assistant',
+	// 	content: 'What is your location?'
+	// }
 ];
 
-export async function function_calling(prompt: string) {
-	let clamp = true;
-	let completed = false;
+const tools = {
+	directions,
+	news,
+	searchEntity,
+	weather,
+	zmanim,
+	default: helper
+};
 
-	try {
-		const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-		const model = genAI.getGenerativeModel({
-			model: 'gemini-1.0-pro',
-			safetySettings,
-			tools: {
-				functionDeclarations
-			}
-		});
+export async function function_calling(msg: string): Promise<[string, boolean, boolean]> {
+	messages.push({
+		role: 'user',
+		content: msg
+	});
 
-		const { totalTokens } = await model.countTokens(prompt);
-		if (totalTokens > 100) {
-			console.log('Total tokens:', totalTokens);
-			return 'Your message is too long. Please shorten and try again.';
+	const result = await generateText({
+		model: google('models/gemini-1.0-pro'),
+		messages,
+		maxTokens: 350,
+		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchEntity, weather or zmanim, use the default function.',
+		tools
+	});
+
+	let response = '';
+
+	if (result.toolResults.length) {
+		const { toolName, args } = result.toolCalls[0];
+
+		// tslint:disable-next-line:no-console
+		console.log(toolName, args);
+
+		if (!(toolName in tools)) {
+			response = result.text;
+			return [response, false, false];
 		}
 
-		const chat = model.startChat();
-		const result = await chat.sendMessage(prompt);
-
-		// For simplicity, this uses the first function call found.
-		const call = result.response.functionCalls()?.[0];
-
-		if (call) {
-			// tslint:disable-next-line:no-console
-			console.log(call.name, call.args);
-			const message = await functions[call.name](call.args);
-
-			return [message, clamp, completed];
-		}
-
-		const message = result.response.text();
-		completed = false;
-
-		return [message, clamp, completed];
-	} catch (error) {
-		console.error(error.message);
-
-		const ERROR = '[SYSTEM] An error occured, please try agian.';
-		return [ERROR, clamp, completed];
+		response =
+			typeof result.toolResults[0].result === 'string'
+				? result.toolResults[0].result
+				: result.toolResults[0].result.join();
+	} else {
+		response = result.text;
 	}
+
+	return [response, false, false];
 }
+
+// msg = `here are services we offer: dictionary, weather, zmanim, news, company info fact checkup and help.
+// Reply which one this sentence most closly matches, Alt reply 'help': What does the forecast say for tomorrow in 10977?`
+
+// https://platform.openai.com/docs/assistants/tools/function-calling/quickstart?lang=node.js

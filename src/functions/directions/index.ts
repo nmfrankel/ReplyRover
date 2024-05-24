@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // https://developers.google.com/maps/documentation/directions/get-directions
 
 interface DirectionResponse {
@@ -80,21 +82,15 @@ export const fetchDirections = async (origin: string, destination: string) => {
 	return formattedDirections;
 };
 
-export const functionDeclaration = {
-	name: 'getDirections',
-	description: 'This function provides directions from one location to another.',
-	parameters: {
-		type: 'OBJECT',
-		properties: {
-			origin: {
-				type: 'STRING',
-				description: 'Departing location, address or landmark.'
-			},
-			destination: {
-				type: 'STRING',
-				description: 'Destination location, address or landmark.'
-			}
-		},
-		required: ['origin', 'destination']
-	}
+export const directions = {
+	descirption: 'This tool is for directions from between two locations.',
+	parameters: z.object({
+		origin: z.string().describe('Departing location, address or landmark.'),
+		destination: z.string().describe('Destination location, address or landmark.'),
+		mode: z
+			.enum(['driving', 'walking', 'bicycling', 'transit'])
+			.describe('The mode of travel, If not explictly defined, return driving.')
+			.optional()
+	}),
+	execute: async ({ origin, destination }: any) => await fetchDirections(origin, destination)
 };
