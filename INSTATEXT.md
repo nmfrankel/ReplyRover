@@ -1,21 +1,29 @@
 # @InstaText
 
-Access online data through sms
+Access online through sms
 
 ### How to use
 
 To join text @instatext to 81010
 Pro tip - Start the text with the \[command\] followd by the \[prompt\], i.e. "Weather (command) for 08701 (prompt)".
 
-### Use-cases
+### Commands
 
 [x] Directions
 [x] Lookup: Business Info
 [-] News: Limited headlines
 [x] Define: Define a word
-[x] Weather: Get a 5 day forecast
+[x] Weather: 5 day forecast
 [x] Wiki: Learn facts
-[x] Zmanim: Get zmanim for the next 24 hours
+[x] Zmanim: Prayer times for the next 24 hours
+~~[-] ? Twitter: Forward/Read posts on X~~
+[ ] Sports: Live sport scores
+[ ] Shopping: Try to buy things
+[ ] Stocks: Live Financial data [limit]
+[ ] Minyan: Find a minyan nearby
+[ ] Deals: Promotions thatv are currently running
+[x] Joke: Crack a smile
+[x] About: Bio about the project
 
 ### Features
 
