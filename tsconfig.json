@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
 		"paths": {
-			"$lib": ["../src/lib"],
-			"$lib/*": ["../src/lib/*"],
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"],
 			"*": ["node_modules/*"]
 		},
 		"rootDirs": [".."],

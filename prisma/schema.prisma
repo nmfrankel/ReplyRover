@@ -18,12 +18,14 @@ model User {
 }
 
 model Event {
-  id        String   @id @default(uuid())
-  userID    String
-  user      User     @relation(fields: [userID], references: [id])
-  action    String
-  message   String?
-  timestamp DateTime @default(now())
+  id                String   @id @default(uuid())
+  userID            String
+  user              User?    @relation(fields: [userID], references: [id])
+  action            String
+  body              String?
+  system_endpoint   String?
+  completed         Boolean?
+  timestamp         DateTime @default(now())
 }
 
 // npx prisma migrate dev --name init
