@@ -1,11 +1,11 @@
 import { google } from '@ai-sdk/google';
-import { CoreMessage, generateText } from 'ai';
-import { helper } from './gpt';
-import { directions } from './directions';
-import { searchEntity } from './lookup';
-import { news } from './news';
-import { weather } from './weather';
-import { zmanim } from './zmanim';
+import { type CoreMessage, generateText } from 'ai';
+import { helper } from './gpt/index';
+import { directions } from './directions/index';
+import { searchEntity } from './lookup/index';
+import { news } from './news/index';
+import { weather } from './weather/index';
+import { zmanim } from './zmanim/index';
 
 const messages: CoreMessage[] = [
 	// {
@@ -37,7 +37,7 @@ export async function function_calling(msg: string): Promise<[string, boolean, b
 		model: google('models/gemini-1.0-pro'),
 		messages,
 		maxTokens: 350,
-		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchEntity, weather or zmanim, use the default function.',
+		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchEntity, weather or zmanim, then use "default" function.',
 		tools
 	});
 

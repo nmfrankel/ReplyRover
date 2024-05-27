@@ -66,15 +66,17 @@ export const formatDate = (
 	timestamp: Date | DateTime | null,
 	timezoneId: string = 'Eastern Standard Time'
 ) => {
-	if (!timestamp) {
-		return 'N/A';
-	} else if (timestamp.toJSDate instanceof Function) {
-		timestamp = timestamp.setZone(timezoneId).toJSDate();
-	}
+	return 'temp';
 
-	const dayOfWeek = timestamp.toLocaleString('en-us', { weekday: 'short' });
-	const month = timestamp.getMonth() + 1;
-	const day = timestamp.getDate().toString().padStart(2, '0');
+	// if (!timestamp) {
+	// 	return 'N/A';
+	// } else if (timestamp.toJSDate instanceof Function) {
+	// 	timestamp = timestamp.setZone(timezoneId).toJSDate();
+	// }
 
-	return `${dayOfWeek} ${month}/${day}`;
+	// const dayOfWeek = timestamp.toLocaleString('en-us', { weekday: 'short' });
+	// const month = timestamp.getMonth() + 1;
+	// const day = timestamp.getDate().toString().padStart(2, '0');
+
+	// return `${dayOfWeek} ${month}/${day}`;
 };

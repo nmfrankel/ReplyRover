@@ -1,8 +1,8 @@
 import { find } from 'geo-tz';
 import * as KosherZmanim from 'kosher-zmanim';
 import { DateTime } from 'luxon';
-import { Zmanim, Zman } from './utils.js';
-import { geocode, formatDate } from '../library.js';
+import { Zmanim, Zman } from './utils';
+import { geocode, formatDate } from '../library';
 import { z } from 'zod';
 
 export const generateZmanim = async (location: string) => {
