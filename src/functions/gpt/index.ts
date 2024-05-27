@@ -1,4 +1,6 @@
-import { HarmBlockThreshold, HarmCategory, GoogleGenerativeAI } from '@google/generative-ai';
+import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { generateText } from 'ai';
 import { z } from 'zod';
 
 const generationConfig = {
@@ -12,7 +14,7 @@ const generationConfig = {
 const safetySettings = [
 	{
 		category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-		threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+		threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
 	},
 	{
 		category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
@@ -21,27 +23,29 @@ const safetySettings = [
 ];
 
 export const getHelp = async (msg: string) => {
-	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-	const model = genAI.getGenerativeModel({
-		model: 'gemini-1.0-pro',
-		generationConfig,
-		safetySettings
+	// For debugging!
+	// tslint:disable-next-line:no-console
+	console.log('GPT processed request');
+
+	const google = createGoogleGenerativeAI({
+		headers: {
+			safetySettings: JSON.stringify(safetySettings),
+			generationConfig: JSON.stringify(generationConfig)
+		}
 	});
 
-	const { totalTokens } = await model.countTokens(msg);
-	if (totalTokens > 2048) return 'Message is too long. Please keep it under 2048 tokens.';
-
-	const prompt = 'limit answer to 3 full sentences:' + msg;
-	let response = '';
-
 	try {
-		const result = await model.generateContent(prompt);
-		response = result.response.text();
-	} catch (error) {
-		response = error.message;
-	}
+		const result = await generateText({
+			model: google('models/gemini-1.0-pro'),
+			prompt: msg,
+			maxTokens: 350,
+			system: 'Keep answers short, max 3 sentences.'
+		});
 
-	return response;
+		return result.text;
+	} catch (error) {
+		return `I cannot fulfill your request. ${error.message}.`;
+	}
 };
 
 export const helper = {
@@ -51,5 +55,4 @@ export const helper = {
 		prompt: z.string().optional().describe('pass original input string.')
 	}),
 	execute: async ({ prompt }: any) => await getHelp(prompt)
-	// execute: async (data) => console.log('default tool', data)
 };
