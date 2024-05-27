@@ -1,4 +1,5 @@
 import { SignalWire } from '@signalwire/realtime-api';
+import { db } from 'src/lib/db';
 
 export async function signalwire(
 	recipient: string,
@@ -8,6 +9,15 @@ export async function signalwire(
 	const client = await SignalWire({
 		project: process.env.SIGNALWIRE_PROJECT_ID,
 		token: process.env.SIGNALWIRE_TOKEN
+	});
+
+	await db.event.create({
+		data: {
+			endpointID: recipient,
+			action: 'response',
+			content: body,
+			system: sender
+		}
 	});
 
 	try {

@@ -7,17 +7,6 @@ import { news } from './news/index';
 import { weather } from './weather/index';
 import { zmanim } from './zmanim/index';
 
-const messages: CoreMessage[] = [
-	// {
-	// 	role: 'user',
-	// 	content: 'weather forcast'
-	// },
-	// {
-	// 	role: 'assistant',
-	// 	content: 'What is your location?'
-	// }
-];
-
 const tools = {
 	directions,
 	news,
@@ -27,15 +16,10 @@ const tools = {
 	default: helper
 };
 
-export async function function_calling(msg: string): Promise<[string, boolean, boolean]> {
-	messages.push({
-		role: 'user',
-		content: msg
-	});
-
+export async function function_calling(thread: CoreMessage[]): Promise<[string, boolean, boolean]> {
 	const result = await generateText({
 		model: google('models/gemini-1.0-pro'),
-		messages,
+		messages: thread,
 		maxTokens: 350,
 		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchEntity, weather or zmanim, then use "default" function.',
 		tools
