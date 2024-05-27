@@ -33,17 +33,17 @@ export const geocode = async (
 			throw new Error('An error occurred while searching your requested location.');
 		}
 
-		const geocode = await response.json();
+		const geocodeResponse = await response.json();
 
-		const coordinates = geocode.results[0]?.geometry.location as Coordinates;
-		const formatted_address = geocode.results[0]?.formatted_address as string;
+		const coordinates = geocodeResponse.results[0]?.geometry.location as Coordinates;
+		const formattedAddress = geocodeResponse.results[0]?.formatted_address as string;
 
-		if (!coordinates || !formatted_address) {
+		if (!coordinates || !formattedAddress) {
 			throw new Error(`No matching locations were found for ${location}.`);
 		}
 
 		const geoLocation = {
-			formatted_address,
+			formatted_address: formattedAddress,
 			...coordinates
 		} as GeoCode;
 
@@ -66,17 +66,15 @@ export const formatDate = (
 	timestamp: Date | DateTime | null,
 	timezoneId: string = 'Eastern Standard Time'
 ) => {
-	return 'temp';
+	if (!timestamp) {
+		return 'N/A';
+	} else if (timestamp.toJSDate instanceof Function) {
+		timestamp = timestamp.setZone(timezoneId).toJSDate();
+	}
 
-	// if (!timestamp) {
-	// 	return 'N/A';
-	// } else if (timestamp.toJSDate instanceof Function) {
-	// 	timestamp = timestamp.setZone(timezoneId).toJSDate();
-	// }
+	const dayOfWeek = timestamp.toLocaleString('en-us', { weekday: 'short' });
+	const month = timestamp.getMonth() + 1;
+	const day = timestamp.getDate().toString().padStart(2, '0');
 
-	// const dayOfWeek = timestamp.toLocaleString('en-us', { weekday: 'short' });
-	// const month = timestamp.getMonth() + 1;
-	// const day = timestamp.getDate().toString().padStart(2, '0');
-
-	// return `${dayOfWeek} ${month}/${day}`;
+	return `${dayOfWeek} ${month}/${day}`;
 };

@@ -53,13 +53,13 @@ export async function que_messages(endpoint: string, payload: string | string[],
 	const chunkRegex = new RegExp(`^[^\\n][\\s\\S]{0,${CHAR_LIMIT}}(?=\\n|$)`, clamp ? 'm' : 'gm');
 
 	const msgChunks = msgs.flatMap((msg) => msg.match(chunkRegex) || []);
-	const sent_messages = msgChunks.map(
+	const sentMessages = msgChunks.map(
 		async (chunk, idx) => await sendViaSignalwire(endpoint, chunk, idx * 1500)
 	);
 
 	await closeDB();
 
-	return sent_messages;
+	return sentMessages;
 }
 
 // The next two functions manage sending out messages

@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/', async (req, res) => {
+app.get('/', async (_, res) => {
 	res.send('Hello world!');
 });
 

@@ -12,8 +12,8 @@ export async function signalwire(endpoint: string, msg: string) {
 			to: endpoint,
 			body: msg
 		});
-		console.log('Message ID: ', sendResult.messageId);
 	} catch (e) {
+		// tslint:disable-next-line:no-console
 		console.error(e.message);
 	}
 }

@@ -16,6 +16,7 @@ export const getCurrent = async (location: string) => {
 
 	if (rawWeather.status !== 200)
 		return `An error occured while retrieving the weather '${locationData.formatted_address}', try again later.`;
+	// tslint:disable-next-line:no-shadowed-variable
 	const weather = await rawWeather.json();
 
 	// simplify values
@@ -52,6 +53,7 @@ export const getForcast = async (location: string, days = 6) => {
 
 	if (rawWeather.status !== 200)
 		return `An error occured while retrieving the weather for '${locationData.formatted_address}', please try us again later.`;
+	// tslint:disable-next-line:no-shadowed-variable
 	const weather = await rawWeather.json();
 	let formatted = locationData.formatted_address + '\n';
 
@@ -59,12 +61,12 @@ export const getForcast = async (location: string, days = 6) => {
 		if (i >= days) return;
 
 		const dt = new Date(d.dt * 1000);
-		const formatted_date = formatDate(dt);
+		const formattedDate = formatDate(dt);
 		const high = Math.round(d.temp.max);
 		const low = Math.round(d.temp.min);
 		const desc = d.weather?.[0].description;
 
-		formatted += `${formatted_date} | ${low}° - ${high}° ${desc}\n`;
+		formatted += `${formattedDate} | ${low}° - ${high}° ${desc}\n`;
 	});
 
 	return formatted;
