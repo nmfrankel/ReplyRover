@@ -1,3 +1,4 @@
+import { geocode } from '$lib/utils';
 import { z } from 'zod';
 
 // https://developers.google.com/maps/documentation/directions/get-directions
@@ -53,10 +54,12 @@ const formatStep = (step: TripInfoType['steps'][0], stepNumber: number) => {
 
 const baseURL = 'https://maps.googleapis.com/maps/api/directions/json';
 
-export const fetchDirections = async (origin: string, destination: string) => {
-	const modes = ['driving', 'walking', 'bicycling', 'transit'];
-	const transportMode = modes[0];
-	const endpoint = `${baseURL}?mode=${transportMode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`;
+export const fetchDirections = async (
+	origin: string,
+	destination: string,
+	mode: string = 'driving'
+) => {
+	const endpoint = `${baseURL}?mode=${mode}&origin=${origin}&destination=${destination}&language=en-US&key=${process.env.GOOGLE_MAPS_PLATFORM_API_KEY}`;
 
 	if (!origin || !destination) {
 		return `Text \'directions\' + where you're leaving from 'to' your destination.\nI.e. directions from 433 S Pascack Rd to Evergreen Kosher, 10952`;
@@ -71,7 +74,16 @@ export const fetchDirections = async (origin: string, destination: string) => {
 		tripInfo = options.routes[0].legs[0];
 		steps = options.routes[0].legs[0].steps;
 	} catch (err) {
-		return `An error occured while searching for a ${transportMode} route based on your given input. Text \'directions\' + where you're leaving from 'to' your destination.\nI.e. directions from 433 S Pascack Rd to Evergreen Kosher, 10952`;
+		const [originError, originGeocode] = await geocode(origin);
+		const [destinationError, destinationGeocode] = await geocode(destination);
+
+		if (originError || !originGeocode.formatted_address) {
+			return `I couldn't find '${origin}'. Where are you leaving from?`;
+		} else if (destinationError || !destinationGeocode) {
+			return `I couldn't find '${destination}'. Where are you going to?`;
+		} else {
+			return `An error occured while searching for a ${mode} route based on your given input [${origin} - ${destination}]. Text directions [where you're leaving from] to [your destination].\nI.e. directions from 433 S Pascack Rd to Evergreen Kosher, 10952`;
+		}
 	}
 
 	const formattedDirections = [
@@ -92,5 +104,6 @@ export const directions = {
 			.describe('The mode of travel, If not explictly defined, return driving.')
 			.optional()
 	}),
-	execute: async ({ origin, destination }: any) => await fetchDirections(origin, destination)
+	execute: async ({ origin, destination, mode }: any) =>
+		await fetchDirections(origin, destination, mode)
 };

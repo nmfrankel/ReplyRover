@@ -46,7 +46,7 @@ export const news = {
 		topic: z
 			.string()
 			.describe(
-				'A topic which to filter the news by. Any topic not rated for conservative children or rabbi approved, are not valid topics, including inappropriate topics, LGBTQ+ or cheating.'
+				'A topic which to filter the news by, can also be a noun. Any topic not rated for conservative children or rabbi approved, are not valid topics, including inappropriate topics, LGBTQ+ or cheating.'
 			),
 		filters: z
 			.string()
