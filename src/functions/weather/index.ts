@@ -85,7 +85,9 @@ export const weather = {
 			),
 		unit: z
 			.enum(['C', 'F'])
-			.describe('The unit to display the temperature in, based on location.')
+			.describe(
+				'The unit to display the temperature in, based on location. When in doubt, use imperial.'
+			)
 	}),
 	execute: async ({ location, days, unit }: any) =>
 		days === 1 ? await getCurrent(location) : await getForcast(location, days || 6)

@@ -1,5 +1,5 @@
 import { SignalWire } from '@signalwire/realtime-api';
-import { db } from 'src/lib/db';
+import { db } from './db';
 
 export async function signalwire(
 	recipient: string,

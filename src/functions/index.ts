@@ -20,8 +20,8 @@ export async function function_calling(thread: CoreMessage[]): Promise<[string, 
 	const result = await generateText({
 		model: google('models/gemini-1.0-pro'),
 		messages: thread,
-		maxTokens: 350,
-		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchEntity, weather or zmanim, then use "default" function.',
+		maxTokens: 400,
+		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchBusinessEntity, weather or zmanim, then use "default" function.',
 		tools
 	});
 
