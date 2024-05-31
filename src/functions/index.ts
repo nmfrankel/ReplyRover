@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { type CoreMessage, generateText } from 'ai';
+import { type CoreMessage, generateText, GenerateTextResult } from 'ai';
 import { helper } from './gpt/index';
 import { directions } from './directions/index';
 import { searchEntity } from './lookup/index';
@@ -17,17 +17,23 @@ const tools = {
 };
 
 export async function function_calling(thread: CoreMessage[]): Promise<[string, boolean, boolean]> {
-	const result = await generateText({
-		model: google('models/gemini-1.0-pro'),
-		messages: thread,
-		maxTokens: 400,
-		system: 'Keep answers short, max 3 sentences. If question is not within directions, news, searchBusinessEntity, weather or zmanim, then use "default" function.',
-		tools
-	});
-
+	let result: GenerateTextResult<typeof tools>;
 	let response = '';
 
-	if (result.toolResults.length) {
+	try {
+		result = await generateText({
+			model: google('models/gemini-1.0-pro'),
+			messages: thread,
+			maxTokens: 400,
+			system: 'Keep answers short, max 3 sentences. If question is not within directions, news, directory assitance, weather or zmanim, then use "default" function.',
+			tools
+		});
+	} catch (error) {
+		response =
+			'An error occured while processing your request. Please change your request and try again.';
+	}
+
+	if (result.toolResults?.length) {
 		const { toolName, args } = result.toolCalls[0];
 
 		// tslint:disable-next-line:no-console

@@ -109,11 +109,14 @@ const groupDaysByHours = (schedule: string[]): string[] => {
 };
 
 export const searchEntity = {
-	descirption: 'This function allows a user to search for a business entity information.',
+	description:
+		'Get directory assistance for business information, phone numbers, addresses and/or store hours.',
 	parameters: z.object({
 		entity: z
 			.string()
-			.describe('Company name with any identifiers like address or location information')
+			.describe(
+				'Company name with any identifiers like address, branch number or location information'
+			)
 	}),
 	execute: async ({ entity }: any) => await entitySearch(entity)
 };

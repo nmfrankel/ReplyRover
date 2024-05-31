@@ -1,42 +1,8 @@
-import { geocode } from '$lib/utils';
 import { z } from 'zod';
+import type { DirectionResponse, TripInfoType } from './types';
+import { geocode } from '../../lib/utils';
 
 // https://developers.google.com/maps/documentation/directions/get-directions
-
-interface DirectionResponse {
-	routes: {
-		legs: {
-			distance: {
-				text: string;
-				value: number;
-			};
-			duration: {
-				text: string;
-				value: number;
-			};
-			end_address: string;
-			start_address: string;
-			steps: {
-				distance: {
-					text: string;
-					value: number;
-				};
-				duration: {
-					text: string;
-					value: number;
-				};
-				end_location: {
-					lat: number;
-					lng: number;
-				};
-				html_instructions: string;
-				travel_mode: string;
-			}[];
-		}[];
-	}[];
-}
-
-type TripInfoType = DirectionResponse['routes'][0]['legs'][0];
 
 // tslint:disable-next-line:variable-name
 const cleanHTML = (string: string) => {
