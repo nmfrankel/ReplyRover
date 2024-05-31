@@ -81,7 +81,7 @@ export const weather = {
 			.min(0)
 			.max(7)
 			.describe(
-				'Count of days to return in the forecast. If not explictly defined, it will return 0 days.'
+				'Count of days to return in the forecast. If not explictly defined, it will return 0 days. Only today can return 1 day.'
 			),
 		unit: z
 			.enum(['C', 'F'])

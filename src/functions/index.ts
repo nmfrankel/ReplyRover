@@ -25,7 +25,7 @@ export async function function_calling(thread: CoreMessage[]): Promise<[string, 
 			model: google('models/gemini-1.0-pro'),
 			messages: thread,
 			maxTokens: 400,
-			system: 'Keep answers short, max 3 sentences. If question is not within directions, news, directory assitance, weather or zmanim, then use "default" function.',
+			system: 'Keep answers short, max 3 sentences. If question is not within directions, news, directory assitance, weather or zmanim, then use "default" function. On "help", respond with sample queries.',
 			tools
 		});
 	} catch (error) {
