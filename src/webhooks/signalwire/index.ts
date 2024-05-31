@@ -6,7 +6,12 @@ import { signalwire } from '../../lib/signalwire';
 
 const router = express.Router();
 
-router.use(async (req, _, next) => {
+router.use('/', async (req, _, next) => {
+	if (req.method !== 'POST') {
+		next();
+		return;
+	}
+
 	const { From: endpoint, To: systemEndpoint, Body: body } = req.body;
 
 	const isNewUser = await db.endpoint.findFirst({

@@ -18,6 +18,10 @@ app.get('/', async (_, res) => {
 
 app.use('/webhooks/signalwire', signalwire_handler);
 
+app.use((err, req, res, next) => {
+	res.status(400).send(err.message);
+});
+
 app.listen(port, () => {
 	// tslint:disable-next-line:no-console
 	console.log(`server started at http://localhost:${port}`);
