@@ -73,7 +73,7 @@ export const getForcast = async (location: string, days = 6) => {
 };
 
 export const weather = {
-	descirption: "Get weather for user's requested location",
+	description: "Get weather for user's requested location",
 	parameters: z.object({
 		location: z.string().describe("User's location"),
 		days: z

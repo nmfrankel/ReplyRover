@@ -49,7 +49,7 @@ export const getHelp = async (msg: string) => {
 };
 
 export const helper = {
-	descirption:
+	description:
 		'This tool can provide provide for anything not under directions, news, directory assitance, weather or zmanim.',
 	parameters: z.object({
 		prompt: z.string().optional().describe('pass original input string.')

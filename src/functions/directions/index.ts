@@ -61,7 +61,7 @@ export const fetchDirections = async (
 };
 
 export const directions = {
-	descirption: 'This tool is for directions from between two locations.',
+	description: 'This tool is for directions from between two locations.',
 	parameters: z.object({
 		origin: z.string().describe('Departing location, address or landmark.'),
 		destination: z.string().describe('Destination location, address or landmark.'),

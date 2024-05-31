@@ -41,7 +41,7 @@ export const fetchNews = async (filter: string) => {
 };
 
 export const news = {
-	descirption: 'Fetch news headlines, with the option to spcify the source and/or topic',
+	description: 'Fetch news headlines, with the option to spcify the source and/or topic',
 	parameters: z.object({
 		topic: z
 			.string()

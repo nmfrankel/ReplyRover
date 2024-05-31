@@ -71,7 +71,7 @@ export const generateZmanim = async (location: string) => {
 };
 
 export const zmanim = {
-	descirption: 'Get zmanim for a given location, with the optional day count.',
+	description: 'Get zmanim for a given location, with the optional day count.',
 	parameters: z.object({
 		location: z.string().describe("User's location"),
 		days: z
