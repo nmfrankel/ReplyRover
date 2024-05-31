@@ -9,7 +9,7 @@ Reply Rover is a webhook server designed to handle incoming SMS traffic. It acts
 -   Wiki: Reply Rover can provide a topic summary from Wikipedia.
 -   Zmanim: Reply Rover can provide information about Jewish prayer times (zmanim).
 
-This server is configured to work in conjunction with [remind-gate](https://github.com/dickermoshe/remind-gate) SMS gateway, enhancing its functionality and providing additional features.
+This server is configured to work in conjunction with [SignalWire's](https://signalwire.com/) SMS gateway, enhancing its functionality and providing additional features.
 
 ## Development
 
