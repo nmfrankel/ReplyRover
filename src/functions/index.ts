@@ -28,28 +28,28 @@ export async function function_calling(thread: CoreMessage[]): Promise<[string, 
 			system: 'Keep answers short, max 3 sentences. If question is not within directions, news, directory assitance, weather or zmanim, then use "default" function. On "help", respond with sample queries.',
 			tools
 		});
+
+		if (result.toolResults?.length) {
+			const { toolName, args } = result.toolCalls[0];
+
+			// tslint:disable-next-line:no-console
+			console.log(toolName, args);
+
+			if (!(toolName in tools)) {
+				response = result.text;
+				return [response, false, false];
+			}
+
+			response =
+				typeof result.toolResults[0].result === 'string'
+					? result.toolResults[0].result
+					: result.toolResults[0].result.join();
+		} else {
+			response = result.text;
+		}
 	} catch (error) {
 		response =
 			'An error occured while processing your request. Please change your request and try again.';
-	}
-
-	if (result.toolResults?.length) {
-		const { toolName, args } = result.toolCalls[0];
-
-		// tslint:disable-next-line:no-console
-		console.log(toolName, args);
-
-		if (!(toolName in tools)) {
-			response = result.text;
-			return [response, false, false];
-		}
-
-		response =
-			typeof result.toolResults[0].result === 'string'
-				? result.toolResults[0].result
-				: result.toolResults[0].result.join();
-	} else {
-		response = result.text;
 	}
 
 	return [response, false, false];
