@@ -4,6 +4,8 @@ import { db } from '../../lib/db';
 import { function_calling } from '../../functions/index';
 import { signalwire } from '../../lib/signalwire';
 
+import { createClient } from '@supabase/supabase-js';
+
 const router = express.Router();
 
 router.use('/', async (req, _, next) => {
@@ -65,6 +67,27 @@ router.get('/error', async (_, res) => {
 
 	res.setHeader('content-type', 'application/xml');
 	res.send(XML_ERROR);
+});
+
+router.post('/gameshow', async (req, res) => {
+	const supabase = createClient(
+		process.env.PUBLIC_SUPABASE_URL,
+		process.env.PUBLIC_SUPABASE_ANON_KEY
+	);
+	const { From: endpoint, To: systemEndpoint, Body: body } = req.body;
+
+	supabase.channel('votes').send({
+		type: 'broadcast',
+		event: 'incoming_vote',
+		payload: {
+			endpoint,
+			body
+		}
+	});
+
+	res.setHeader('content-type', 'application/xml');
+	res.send(`<?xml version="1.0" encoding="UTF-8"?>
+	<Response><Message>Received</Message></Response>`);
 });
 
 router.post('/', async (req, res) => {
