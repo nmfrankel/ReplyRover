@@ -76,14 +76,16 @@ router.post('/gameshow', async (req, res) => {
 	);
 	const { From: endpoint, To: systemEndpoint, Body: body } = req.body;
 
-	supabase.channel('votes').send({
-		type: 'broadcast',
-		event: 'incoming_vote',
-		payload: {
-			endpoint,
-			body
-		}
-	});
+	const { error } = await supabase.from('vote').insert({ value: body, user: endpoint });
+
+	// supabase.channel('votes').send({
+	// 	type: 'broadcast',
+	// 	event: 'incoming_vote',
+	// 	payload: {
+	// 		endpoint,
+	// 		body
+	// 	}
+	// });
 
 	res.setHeader('content-type', 'application/xml');
 	res.send(`<?xml version="1.0" encoding="UTF-8"?>
