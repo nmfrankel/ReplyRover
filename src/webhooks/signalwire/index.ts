@@ -8,59 +8,59 @@ import { createClient } from '@supabase/supabase-js';
 
 const router = express.Router();
 
-router.use('/', async (req, _, next) => {
-	if (req.method !== 'POST') {
-		next();
-		return;
-	}
+// router.use('/', async (req, _, next) => {
+// 	if (req.method !== 'POST') {
+// 		next();
+// 		return;
+// 	}
 
-	const { From: endpoint, To: systemEndpoint, Body: body } = req.body;
+// 	const { From: endpoint, To: systemEndpoint, Body: body } = req.body;
 
-	const isNewUser = await db.endpoint.findFirst({
-		where: {
-			id: endpoint
-		}
-	});
-	const event = isNewUser ? 'message' : 'new_user';
+// 	const isNewUser = await db.endpoint.findFirst({
+// 		where: {
+// 			id: endpoint
+// 		}
+// 	});
+// 	const event = isNewUser ? 'message' : 'new_user';
 
-	const loggedEvent = await db.event.create({
-		data: {
-			endpoint: {
-				connectOrCreate: {
-					create: {
-						id: endpoint,
-						user: {
-							create: {
-								name: null
-							}
-						}
-					},
-					where: {
-						id: endpoint
-					}
-				}
-			},
-			action: event,
-			content: body,
-			system: systemEndpoint
-		}
-	});
+// 	const loggedEvent = await db.event.create({
+// 		data: {
+// 			endpoint: {
+// 				connectOrCreate: {
+// 					create: {
+// 						id: endpoint,
+// 						user: {
+// 							create: {
+// 								name: null
+// 							}
+// 						}
+// 					},
+// 					where: {
+// 						id: endpoint
+// 					}
+// 				}
+// 			},
+// 			action: event,
+// 			content: body,
+// 			system: systemEndpoint
+// 		}
+// 	});
 
-	// tslint:disable-next-line:no-console
-	console.log(`[SYSTEM] message from ${endpoint} logged [${loggedEvent.id}]`);
+// 	// tslint:disable-next-line:no-console
+// 	console.log(`[SYSTEM] message from ${endpoint} logged [${loggedEvent.id}]`);
 
-	if (event === 'new_user' && body.length > 4) {
-		const HELP_MSG = `I'm ready to assist you with whatever you would like.`;
+// 	if (event === 'new_user' && body.length > 4) {
+// 		const HELP_MSG = `I'm ready to assist you with whatever you would like.`;
 
-		await new Promise((r) => setTimeout(r, 5000));
-		await signalwire(endpoint, HELP_MSG, systemEndpoint);
-	} else if (event !== 'message') {
-		next();
-		return;
-	}
+// 		await new Promise((r) => setTimeout(r, 5000));
+// 		await signalwire(endpoint, HELP_MSG, systemEndpoint);
+// 	} else if (event !== 'message') {
+// 		next();
+// 		return;
+// 	}
 
-	next();
-});
+// 	next();
+// });
 
 router.get('/error', async (_, res) => {
 	const XML_ERROR = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>Our server seems to have a glitched, try again later.</Message></Response>`;
